@@ -1,0 +1,8 @@
+baseURL = 'https://shashank-93rao.github.io/'
+languageCode = 'en-us'
+title = '/home/shashankrao'
+theme = 'tale'
+
+[Site]
+    [Author]
+        name = 'Shashank'
