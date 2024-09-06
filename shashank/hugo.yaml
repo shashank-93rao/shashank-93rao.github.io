@@ -1,13 +1,13 @@
 baseURL: https://shashank-93rao.github.io/
 languageCode: en-us
-title: /home/shashankrao
+title: /home/shashankrao/
 theme: mini
 
 params:
   # Site Author
   author: Shashank Rao
   # Author biography
-  bio: Shashank Rao
+  bio: Dive into my notebook
   # Site Description, used in HTML meat
   description: My Blog
 
