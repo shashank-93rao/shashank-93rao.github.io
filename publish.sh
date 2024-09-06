@@ -2,5 +2,5 @@
 
 rm -rf ./docs
 mkdir ./docs
-cd hugo && hugo -D && cd ..
-cp -r hugo/public/* docs/
+cd shashank && hugo && cd ..
+cp -r shashank/public/* docs/
