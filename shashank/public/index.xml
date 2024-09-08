@@ -6,12 +6,19 @@
     <description>Recent content on /home/shashankrao/</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 07 Aug 2022 09:31:51 +0530</lastBuildDate>
+    <lastBuildDate>Fri, 06 Sep 2024 10:54:51 +0530</lastBuildDate>
     <atom:link href="https://shashank-93rao.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Let&#39;s dive into Bigtable</title>
+      <link>https://shashank-93rao.github.io/posts/bigtable/</link>
+      <pubDate>Fri, 06 Sep 2024 10:54:51 +0530</pubDate>
+      <guid>https://shashank-93rao.github.io/posts/bigtable/</guid>
+      <description>&lt;p&gt;Bigtable is a super fast, distributed storage system built to handle loads of structured data—think petabytes worth—while keeping things quick and responsive. It&amp;rsquo;s the engine behind many Google products you know and love, like Google Analytics and Google Earth.&lt;/p&gt;&#xA;&lt;p&gt;In this post, I&amp;rsquo;ll break down the key points from the original Google Bigtable paper. If you&amp;rsquo;re up for some deeper reading, I&amp;rsquo;ve linked the full paper at the end—definitely worth a look!&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Hugo: An alternative to Jekyll</title>
       <link>https://shashank-93rao.github.io/posts/setup/</link>
-      <pubDate>Sun, 07 Aug 2022 09:31:51 +0530</pubDate>
+      <pubDate>Sun, 01 Sep 2024 09:31:51 +0530</pubDate>
       <guid>https://shashank-93rao.github.io/posts/setup/</guid>
       <description>&lt;p&gt;I’ve always wanted to set up a vanity blog to showcase anything cool and awesome that I’ve worked on. Having seen a couple of my friends write blogs on WordPress and Blogger, these two blogging sites were the first to pop into my mind. However, for a simple use-case like mine, it seemed complicated and unnecessary. All I needed was a domain, a place to host my content, and an HTML generator to turn simple text into beautiful HTML.&lt;/p&gt;</description>
     </item>

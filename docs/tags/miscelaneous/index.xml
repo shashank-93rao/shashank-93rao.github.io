@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Miscelaneous on /home/shashankrao/</title>
+    <link>https://shashank-93rao.github.io/tags/miscelaneous/</link>
+    <description>Recent content in Miscelaneous on /home/shashankrao/</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 01 Sep 2024 09:31:51 +0530</lastBuildDate>
+    <atom:link href="https://shashank-93rao.github.io/tags/miscelaneous/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hugo: An alternative to Jekyll</title>
+      <link>https://shashank-93rao.github.io/posts/setup/</link>
+      <pubDate>Sun, 01 Sep 2024 09:31:51 +0530</pubDate>
+      <guid>https://shashank-93rao.github.io/posts/setup/</guid>
+      <description>&lt;p&gt;I’ve always wanted to set up a vanity blog to showcase anything cool and awesome that I’ve worked on. Having seen a couple of my friends write blogs on WordPress and Blogger, these two blogging sites were the first to pop into my mind. However, for a simple use-case like mine, it seemed complicated and unnecessary. All I needed was a domain, a place to host my content, and an HTML generator to turn simple text into beautiful HTML.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

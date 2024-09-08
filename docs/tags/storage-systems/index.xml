@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Storage Systems on /home/shashankrao/</title>
+    <link>https://shashank-93rao.github.io/tags/storage-systems/</link>
+    <description>Recent content in Storage Systems on /home/shashankrao/</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 06 Sep 2024 10:54:51 +0530</lastBuildDate>
+    <atom:link href="https://shashank-93rao.github.io/tags/storage-systems/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Let&#39;s dive into Bigtable</title>
+      <link>https://shashank-93rao.github.io/posts/bigtable/</link>
+      <pubDate>Fri, 06 Sep 2024 10:54:51 +0530</pubDate>
+      <guid>https://shashank-93rao.github.io/posts/bigtable/</guid>
+      <description>&lt;p&gt;Bigtable is a super fast, distributed storage system built to handle loads of structured data—think petabytes worth—while keeping things quick and responsive. It&amp;rsquo;s the engine behind many Google products you know and love, like Google Analytics and Google Earth.&lt;/p&gt;&#xA;&lt;p&gt;In this post, I&amp;rsquo;ll break down the key points from the original Google Bigtable paper. If you&amp;rsquo;re up for some deeper reading, I&amp;rsquo;ve linked the full paper at the end—definitely worth a look!&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>
