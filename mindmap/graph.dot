@@ -1,0 +1,16 @@
+digraph G {
+    // Define nodes with labels
+    Consul [label="Consul"]
+    Raft [label="Raft Consensus Algorithm"]
+    Bigtable [label="Bigtable"]
+    Paxos [label="Paxos Consensus Algorithm"]
+
+    // Define edges with labels
+    Consul -> Raft [label="uses"]
+    Raft -> "Consensus Algorithm" [label="is a type of"]
+    Bigtable -> Paxos [label="uses"]
+    Paxos -> "Consensus Algorithm" [label="is a type of"]
+
+    // Define a node for Consensus Algorithm
+    "Consensus Algorithm" [shape=box, style=dashed, label="Consensus Algorithm"]
+}
