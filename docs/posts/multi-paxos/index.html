@@ -13,7 +13,6 @@ Continue from where we left in Paxos:
 
 A proposer&rsquo;s proposal has been accepted.
 This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal ballot = 1, Log[0] = &quot;Insert X&quot; was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number:
-
 ballot = 1, Log[0] = &#34;Insert Y&#34;
 ballot = 1, Log[2] = &#34;Insert Z&#34;
 ">
@@ -86,11 +85,10 @@ But what if you want to propose a stream of values?</p>
 <p>Continue from where we left in Paxos:</p>
 <ol>
 <li>A proposer&rsquo;s proposal has been accepted.</li>
-<li>This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal <code>ballot = 1, Log[0] = &quot;Insert X&quot;</code> was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number:</li>
-</ol>
+<li>This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal <code>ballot = 1, Log[0] = &quot;Insert X&quot;</code> was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number:
 <pre tabindex="0"><code>ballot = 1, Log[0] = &#34;Insert Y&#34;
 ballot = 1, Log[2] = &#34;Insert Z&#34;
-</code></pre><ol start="3">
+</code></pre></li>
 <li>If this node crashes, another node can begin the prepare phase with a higher ballot number. And as part of the promise response, it receives <code>ballot = 1, Log[2] = &quot;Insert Z&quot;</code> .</li>
 <li>Now, it sends accept message <code>ballot = 100, Log[3] = &quot;Insert L&quot;</code>. This get&rsquo;s accepted and it assumes leadership.</li>
 </ol>
