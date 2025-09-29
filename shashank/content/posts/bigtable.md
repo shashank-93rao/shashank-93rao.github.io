@@ -3,7 +3,6 @@ title: "Let's dive into Bigtable"
 date: 2024-09-06T10:54:51+05:30
 draft: false
 tags: 
- - "Storage Systems"
  - GCP
  - Databases
 ---

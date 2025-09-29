@@ -6,8 +6,15 @@
     <description>Recent content in Posts on /home/shashankrao/</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 06 Sep 2024 10:54:51 +0530</lastBuildDate>
+    <lastBuildDate>Mon, 29 Sep 2025 20:42:34 +0530</lastBuildDate>
     <atom:link href="https://shashank-93rao.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Consensus</title>
+      <link>https://shashank-93rao.github.io/posts/consensus/</link>
+      <pubDate>Mon, 29 Sep 2025 20:42:34 +0530</pubDate>
+      <guid>https://shashank-93rao.github.io/posts/consensus/</guid>
+      <description>&lt;p&gt;Requirements of consensus:&lt;/p&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Single  proposed value is chosen&lt;/li&gt;&#xA;&lt;li&gt;Value chosen is proposed by the processes that are part of the system&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h5 id=&#34;what-do-consensus-algorithms-do-what-is-the-problem-they-solve&#34;&gt;&lt;strong&gt;What do consensus algorithms do? What is the problem they solve?&lt;/strong&gt; &lt;a href=&#34;#what-do-consensus-algorithms-do-what-is-the-problem-they-solve&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h5&gt;&lt;p&gt;Consensus means agreement. In a distributed system, multiple nodes agreeing on a state is facilitated by consensus algorithms. But it&amp;rsquo;s not just one single value! Distributed systems keep getting a sequence of state change events that are constantly applied. All nodes will have to agree on the sequence of state changes as well. If Node A in a three node system of Nodes A, B, C receives a sequence of state changes X, Y, Z, then it needs to propagate this set of state changes to the remaining two nodes in the very same order. This is basically [[Log Replication]]!&#xA;Consensus and replication is closely related! Reliable, consistent and correct/safe replication requires consensus!&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Let&#39;s dive into Bigtable</title>
       <link>https://shashank-93rao.github.io/posts/bigtable/</link>

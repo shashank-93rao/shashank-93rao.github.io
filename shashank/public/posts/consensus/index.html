@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <title>/home/shashankrao/</title>
+    <title>Consensus | /home/shashankrao/</title>
 
     <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
 <meta name="viewport" content="width=device-width,minimum-scale=1">
-<meta name="description" content="My Blog">
+<meta name="description" content="Requirements of consensus:
+
+Single  proposed value is chosen
+Value chosen is proposed by the processes that are part of the system
+
+What do consensus algorithms do? What is the problem they solve? 🔗Consensus means agreement. In a distributed system, multiple nodes agreeing on a state is facilitated by consensus algorithms. But it&rsquo;s not just one single value! Distributed systems keep getting a sequence of state change events that are constantly applied. All nodes will have to agree on the sequence of state changes as well. If Node A in a three node system of Nodes A, B, C receives a sequence of state changes X, Y, Z, then it needs to propagate this set of state changes to the remaining two nodes in the very same order. This is basically [[Log Replication]]!
+Consensus and replication is closely related! Reliable, consistent and correct/safe replication requires consensus!">
 <meta name="generator" content="Hugo 0.134.1">
 
 
@@ -23,11 +29,6 @@
 
 
 
-
-  
-    <link href="/posts/index.xml" rel="alternate" type="application/rss+xml" title="/home/shashankrao/" />
-    <link href="/posts/index.xml" rel="feed" type="application/rss+xml" title="/home/shashankrao/" />
-  
 
 
 
@@ -50,101 +51,55 @@
 
     <main class="main">
       
-<header class="profile">
+
+<section id="single">
+    <h1 class="title">Consensus</h1>
+
+    <div class="tip">
+        <time datetime="2025-09-29 20:42:34 &#43;0530 IST">Sep 29, 2025</time>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          151 words
+        </span>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          1 minute read
+        </span>
+    </div>
+
     
-        <img class="avatar" alt="avatar" src="/images/avatar.png" />
     
 
-    <h1>/home/shashankrao/</h1>
-    
-    
-      <h2>Dive into my notebook</h2>
-    
-</header>
 
-<section id="archive">
-    
-        <div class="group">
-            <h3 class="key">
-                2025
-            </h3>
+    <div class="content">
+      <p>Requirements of consensus:</p>
+<ul>
+<li>Single  proposed value is chosen</li>
+<li>Value chosen is proposed by the processes that are part of the system</li>
+</ul>
+<h5 id="what-do-consensus-algorithms-do-what-is-the-problem-they-solve"><strong>What do consensus algorithms do? What is the problem they solve?</strong> <a href="#what-do-consensus-algorithms-do-what-is-the-problem-they-solve" class="anchor">🔗</a></h5><p>Consensus means agreement. In a distributed system, multiple nodes agreeing on a state is facilitated by consensus algorithms. But it&rsquo;s not just one single value! Distributed systems keep getting a sequence of state change events that are constantly applied. All nodes will have to agree on the sequence of state changes as well. If Node A in a three node system of Nodes A, B, C receives a sequence of state changes X, Y, Z, then it needs to propagate this set of state changes to the remaining two nodes in the very same order. This is basically [[Log Replication]]!
+Consensus and replication is closely related! Reliable, consistent and correct/safe replication requires consensus!</p>
+<p>Another use case is [[Leader Election]]</p>
 
+    </div>
+
+    
+        <div class="tags">
             
-                <div class="value">
-                  <div class="date">
-                    <time datetime="2025-09-29 20:42:34 &#43;0530 IST">Sep 29</time>
-                  </div>
-                  <div class="title">
-                      <a href="https://shashank-93rao.github.io/posts/consensus/">
-                          Consensus
-                      </a>
-
-                      
-                          <div class="tags">
-                              
-                                  <a href="https://shashank-93rao.github.io/tags/gcp">GCP</a>
-                              
-                                  <a href="https://shashank-93rao.github.io/tags/databases">Databases</a>
-                              
-                          </div>
-                      
-                  </div>
-                </div>
-                      
+                <a href="https://shashank-93rao.github.io/tags/gcp">GCP</a>
+            
+                <a href="https://shashank-93rao.github.io/tags/databases">Databases</a>
+            
         </div>
     
-        <div class="group">
-            <h3 class="key">
-                2024
-            </h3>
-
-            
-                <div class="value">
-                  <div class="date">
-                    <time datetime="2024-09-06 10:54:51 &#43;0530 IST">Sep 6</time>
-                  </div>
-                  <div class="title">
-                      <a href="https://shashank-93rao.github.io/posts/bigtable/">
-                          Let&#39;s dive into Bigtable
-                      </a>
-
-                      
-                          <div class="tags">
-                              
-                                  <a href="https://shashank-93rao.github.io/tags/gcp">GCP</a>
-                              
-                                  <a href="https://shashank-93rao.github.io/tags/databases">Databases</a>
-                              
-                          </div>
-                      
-                  </div>
-                </div>
-            
-                <div class="value">
-                  <div class="date">
-                    <time datetime="2024-09-01 09:31:51 &#43;0530 IST">Sep 1</time>
-                  </div>
-                  <div class="title">
-                      <a href="https://shashank-93rao.github.io/posts/setup/">
-                          Hugo: An alternative to Jekyll
-                      </a>
-
-                      
-                          <div class="tags">
-                              
-                                  <a href="https://shashank-93rao.github.io/tags/miscelaneous">Miscelaneous</a>
-                              
-                          </div>
-                      
-                  </div>
-                </div>
-                      
-        </div>
     
-
+    
 
 </section>
-
 
 
     </main>
