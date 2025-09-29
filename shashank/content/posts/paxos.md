@@ -7,6 +7,7 @@ draft: "false"
 Paxos is a simple [Consensus](/posts/consensus) algorithm. 
 It was introduced by Leslie Lamport. Can read more [here](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf)
 
+
 Paxos guarantees that there is consensus among multiple processes.
 
 Setup: X nodes/processes
