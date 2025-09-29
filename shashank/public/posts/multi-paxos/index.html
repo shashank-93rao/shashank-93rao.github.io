@@ -12,7 +12,7 @@ But what if you want to propose a stream of values?
 Continue from where we left in Paxos:
 
 A proposer&rsquo;s proposal has been accepted.
-This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal ballot = 1, Log[0] = &quot;Insert X&quot; was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number: ```
+This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal ballot = 1, Log[0] = &quot;Insert X&quot; was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number:
 
 ballot = 1, Log[0] = &#34;Insert Y&#34;
 ballot = 1, Log[2] = &#34;Insert Z&#34;
@@ -65,7 +65,7 @@ ballot = 1, Log[2] = &#34;Insert Z&#34;
           ·
         </span>
         <span>
-          232 words
+          231 words
         </span>
         <span class="split">
           ·
@@ -86,7 +86,7 @@ But what if you want to propose a stream of values?</p>
 <p>Continue from where we left in Paxos:</p>
 <ol>
 <li>A proposer&rsquo;s proposal has been accepted.</li>
-<li>This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal <code>ballot = 1, Log[0] = &quot;Insert X&quot;</code> was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number: ```</li>
+<li>This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal <code>ballot = 1, Log[0] = &quot;Insert X&quot;</code> was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number:</li>
 </ol>
 <pre tabindex="0"><code>ballot = 1, Log[0] = &#34;Insert Y&#34;
 ballot = 1, Log[2] = &#34;Insert Z&#34;

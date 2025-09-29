@@ -12,7 +12,7 @@ But what if you want to propose a stream of values?
 
 Continue from where we left in Paxos:
 1. A proposer's proposal has been accepted.
-2. This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal `ballot = 1, Log[0] = "Insert X"` was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number: ```
+2. This proposer can propose another value to the acceptors on the same proposal/ballot number. It need not start another prepare phase. Eg: The first proposal `ballot = 1, Log[0] = "Insert X"` was accepted. Now, this node has become the leader. It can keep sending more accept messages on the same ballot number:
 ```
 ballot = 1, Log[0] = "Insert Y"
 ballot = 1, Log[2] = "Insert Z"
