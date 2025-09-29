@@ -68,6 +68,26 @@
         
         <section class="item">
           <div>
+            <h1 class="title"><a href='/posts/paxos/'>Paxos</a></h1>
+            <div class ="date">
+                <time datetime="2025-09-29 21:52:55 &#43;0530 IST">Sep 29, 2025</time>  
+            </div>
+          </div>
+
+          
+              <div class="summary">Paxos is a simple Consensus algorithm. It was introduced by Leslie Lamport. Can read more here
+Paxos guarantees that there is consensus among multiple processes.
+Setup: X nodes/processes Works in phases:
+The proposer chooses a proposal number p with the given value v. It sends the message prepare(p,v) to a set of nodes &gt;= x/2 &#43; 1 (majority) At the acceptor end, there are two cases: Received prepare(p,v). Already accepted a proposal (x, y) where x&gt;p. Ignore the message (or send a negative reply). If already accepted proposal (x, y) where x&lt;p. Promise the proposer that I won’t accept any proposal with proposal number &lt; p. Send the values (x,y) as part of promise to the proposer. (if nothing was previously promised, then send p,v) At proposer end: If the majority of acceptors did not respond, then your proposal was rejected. Repeat with higher proposal number. If received promises from the majority of acceptors, then we need to set value to our proposal. Value for proposal = value of the highest proposal number received in the promise responses. Accept phase: Now send an accept message to all the acceptors with your proposal number and the value you decided in the previous step. If you receive acks from majority, then consensus is reached. Else, repeat. Note: Ballot number has to be unique across nodes. Else it breaks safety in Paxos. Maybe the nodes can memorize who sent what ballot as part of their promise and reject another node sending same ballot number.
+</div>
+          
+
+        </section>
+    
+        
+        
+        <section class="item">
+          <div>
             <h1 class="title"><a href='/posts/consensus/'>Consensus</a></h1>
             <div class ="date">
                 <time datetime="2025-09-29 20:42:34 &#43;0530 IST">Sep 29, 2025</time>  
