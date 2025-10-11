@@ -2,6 +2,8 @@
 title: Paxos
 date: 2025-09-29T21:52:55+05:30
 draft: "false"
+tags:
+  - consensus
 ---
 Paxos is a simple [Consensus]({{< ref "Consensus" >}}) algorithm that was introduced by Leslie Lamport. It serves as a building block for multiple other consensus algorithm. You can read more about it [here](https://lamport.azurewebsites.net/pubs/paxos-simple.pdf)
 

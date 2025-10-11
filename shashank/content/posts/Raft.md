@@ -2,6 +2,8 @@
 title: Raft
 date: 2025-09-30T21:48:51+05:30
 draft: "false"
+tags:
+  - consensus
 ---
 
 Raft is one of the most popular [Consensus]({{< ref "Consensus" >}}) algorithm that's present today. Can read more about it [here](https://raft.github.io/raft.pdf). 
@@ -29,7 +31,7 @@ if requestTerm > currentTerm:
 	currentTerm = requestTerm // it's a new election
 	currentTermVotedFor = null // haven't voted yet
 
-if requestTerm >= currentTerm && (currentTermVotedFor <mark> null || currentTermVotedFor </mark> requesterId):
+if requestTerm >= currentTerm && (currentTermVotedFor == null || currentTermVotedFor == requesterId):
 	// This is a term which I haven't voted in
 	
 	if myLastLogEntryIndex <= requestLastLogEntryIndex && myLastLogEntryTerm <= requestLastLogEntryTerm:

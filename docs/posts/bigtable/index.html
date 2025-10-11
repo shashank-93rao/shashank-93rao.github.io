@@ -6,7 +6,7 @@
     <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
 <meta name="viewport" content="width=device-width,minimum-scale=1">
-<meta name="description" content="Bigtable is a super fast, distributed storage system built to handle loads of structured data—think petabytes worth—while keeping things quick and responsive. It&rsquo;s the engine behind many Google products you know and love, like Google Analytics and Google Earth.
+<meta name="description" content="Bigtable is a superfast, distributed storage system built to handle loads of structured data—think petabytes worth—while keeping things quick and responsive. It&rsquo;s the engine behind many Google products you know and love, like Google Analytics and Google Earth.
 In this post, I&rsquo;ll break down the key points from the original Google Bigtable paper. If you&rsquo;re up for some deeper reading, I&rsquo;ve linked the full paper at the end—definitely worth a look!">
 <meta name="generator" content="Hugo 0.134.1">
 
@@ -56,7 +56,7 @@ In this post, I&rsquo;ll break down the key points from the original Google Bigt
           ·
         </span>
         <span>
-          1896 words
+          1895 words
         </span>
         <span class="split">
           ·
@@ -71,7 +71,7 @@ In this post, I&rsquo;ll break down the key points from the original Google Bigt
 
 
     <div class="content">
-      <p>Bigtable is a super fast, distributed storage system built to handle loads of structured data—think petabytes worth—while keeping things quick and responsive. It&rsquo;s the engine behind many Google products you know and love, like Google Analytics and Google Earth.</p>
+      <p>Bigtable is a superfast, distributed storage system built to handle loads of structured data—think petabytes worth—while keeping things quick and responsive. It&rsquo;s the engine behind many Google products you know and love, like Google Analytics and Google Earth.</p>
 <p>In this post, I&rsquo;ll break down the key points from the original Google Bigtable paper. If you&rsquo;re up for some deeper reading, I&rsquo;ve linked the full paper at the end—definitely worth a look!</p>
 <h2 id="the-data-model">The Data Model <a href="#the-data-model" class="anchor">🔗</a></h2><p>Under the hood, Bigtable&rsquo;s data model treats everything like a multi-dimensional sorted map. Data gets stored in cells that are indexed by three things: a row key, a column key, and a timestamp. The timestamp helps version the data, so you can see what was stored at different times. You can set this timestamp yourself, or let Bigtable handle it automatically when you insert data. It&rsquo;s important to note that the data itself is immutable—once it&rsquo;s set, any update you make is actually a new insertion with a more recent timestamp. Older versions of cells are regularly cleaned up (garbage collected) based on the settings you configure.</p>
 <pre tabindex="0"><code>                                             +---------+---------+---------+
@@ -94,20 +94,20 @@ In this post, I&rsquo;ll break down the key points from the original Google Bigt
 <p>Metadata tablet files, in turn, contain the locations of the user tablet data files. The row key in a metadata tablet is made of the table identifier and last row of the tablet.</p>
 <p>Finally, the user tablets hold the actual SSTables and Write-Ahead Log (WAL) files where the user data is stored.</p>
 <p><p class="markdown-image">
-  <img src="/images/bigtable-tablets.png" alt="Tablets and Tablet Assignment"  />
+  <img src="/images/bigtable-tablets.png" alt="Image"  />
 </p></p>
 <h3 id="tablet-assignment">Tablet Assignment <a href="#tablet-assignment" class="anchor">🔗</a></h3><p>The master server in Bigtable plays a key role in managing the system. It&rsquo;s in charge of assigning tablets to tablet servers and keeping track of which server handles which tablet. If a tablet isn’t assigned to any server, the master steps in and assigns it to an available server. To keep tabs on live tablet servers, Bigtable uses Chubby. Each tablet server maintains an exclusive lock on a file in a specific directory in Chubby, and Bigtable watches this directory to see which servers are active. If a network issue occurs and a tablet server loses its exclusive lock, the server shuts itself down. Similarly, if a server is taken down for cluster management, it releases its lock.</p>
 <p>The master server also routinely checks the health of each tablet server. If a server keeps failing these health checks or reports that it has lost its lock, the master server tries to grab the server&rsquo;s lock. If it succeeds, it means the tablet server is out of the picture and won&rsquo;t be serving any more tablet requests. The master quickly reassigns the tablets from the failed server to another one that’s available.</p>
 <p>If the master server loses its own lock, it also shuts itself down. When a new master server is brought online by the cluster management system, it acquires an exclusive lock to announce it’s up and running. The new master then checks with Chubby to find the list of active tablet servers. It queries these servers to figure out which tablets have already been assigned and checks the metadata tablets to identify any unassigned tablets that need attention. For the master server to read these metadata tablets, they need to be loaded by the tablet servers. So, the master first checks if the root tablet is unassigned, verifies the assignments of all servers, and assigns the root tablet if necessary.</p>
 <p>Clients cache the location of the tablets and directly query the tablet servers, so data transfer between clients and tablets doesn’t go through the master server. This setup ensures that the master server isn&rsquo;t bogged down with too much load.
 <p class="markdown-image">
-  <img src="/images/bigtable-assignment.png" alt="Tablets and Tablet Assignment"  />
+  <img src="/images//bigtable-assignment.png" alt="Image"  />
 </p></p>
 <h2 id="reading-and-writing-data">Reading and writing data <a href="#reading-and-writing-data" class="anchor">🔗</a></h2><p>Each tablet comprises of three things: A commit log, a memtable and one or more SSTables.</p>
 <p>The commit log is an append-only file that keeps track of every write operation. At the same time, recent writes are also stored in an in-memory data structure called the memtable, which keeps things sorted and relatively inexpensive to query (think of something like Red-Black Trees). Once the memtable hits a certain size, its contents are flushed to a new SSTable. When read requests come in, Bigtable serves them by merging the view from both the memtable and the SSTables. Note that the row key is important to read any data in Bigtable. Hence Bigtable is not meant for use cases where you want to get data based on a certain column value (something like <code>select * from table where x = 1</code>). Such a requirement would have to scan the entire table. As you can imagine, that is not very optimal.</p>
 <p>The process of flushing the memtable to an SSTable is called a &ldquo;minor compaction&rdquo; and it creates new SSTables. From time to time, Bigtable also performs a &ldquo;major compaction&rdquo;, where it merges multiple SSTables into one. This process combines all the changes made to the same key across multiple SSTables into a single entry, reducing the overall number of SSTables.</p>
 <p><p class="markdown-image">
-  <img src="/images/user-tablet.png" alt="User Tablet"  />
+  <img src="/images/user-tablet.png" alt="Image"  />
 </p></p>
 <h2 id="optimizations">Optimizations <a href="#optimizations" class="anchor">🔗</a></h2><h3 id="locality-groups">Locality Groups <a href="#locality-groups" class="anchor">🔗</a></h3><p>By default, all the column families for a row are stored together in one SST file. But in practice, clients seldom query all column families at once. To handle this efficiently, Bigtable introduces the idea of Locality Groups. A locality group lets you bundle a set of column families together, so rows from same locality groups end up in the same SST files. This setup boosts read performance for queries that only need data from a particular locality group, because it cuts down the amount of data that needs to be read from disk.</p>
 <h3 id="caching">Caching <a href="#caching" class="anchor">🔗</a></h3><p>Bigtable employs two levels of caching within the tablet servers. First, the Scan Cache caches the key value pairs read by the tablet server. This benefits clients that re-read the same keys. Further, a lower level cache called the Block Cache caches the blocks of the SSTs read by the tablet server. This benefits clients who read keys that are adjacent to each other since it&rsquo;s likely that the two keys will be present in the same block.</p>
@@ -127,9 +127,9 @@ not be handling all the tablets that&rsquo;s been written in the log. Hence Bigt
     
         <div class="tags">
             
-                <a href="https://shashank-93rao.github.io/tags/gcp">GCP</a>
+                <a href="https://shashank-93rao.github.io/tags/gcp">gcp</a>
             
-                <a href="https://shashank-93rao.github.io/tags/databases">Databases</a>
+                <a href="https://shashank-93rao.github.io/tags/database">database</a>
             
         </div>
     

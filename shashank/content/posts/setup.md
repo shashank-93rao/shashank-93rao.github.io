@@ -3,7 +3,7 @@ title: "Hugo: An alternative to Jekyll"
 date: 2024-09-01T09:31:51+05:30
 draft: false
 tags:
-    - Miscelaneous
+  - misc
 ---
 
 I’ve always wanted to set up a vanity blog to showcase anything cool and awesome that I’ve worked on. Having seen a couple of my friends write blogs on WordPress and Blogger, these two blogging sites were the first to pop into my mind. However, for a simple use-case like mine, it seemed complicated and unnecessary. All I needed was a domain, a place to host my content, and an HTML generator to turn simple text into beautiful HTML.

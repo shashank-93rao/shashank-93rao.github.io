@@ -2,6 +2,8 @@
 title: Consensus
 date: 2025-09-29T21:34:06+05:30
 draft: "false"
+tags:
+  - consensus
 ---
 In distributed systems, consensus is all about ensuring multiple nodes agree on a single state even in the face of failures.
 

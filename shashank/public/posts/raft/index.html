@@ -88,7 +88,7 @@ if requestTerm &gt; currentTerm:
 	currentTerm = requestTerm // it&#39;s a new election
 	currentTermVotedFor = null // haven&#39;t voted yet
 
-if requestTerm &gt;= currentTerm &amp;&amp; (currentTermVotedFor &lt;mark&gt; null || currentTermVotedFor &lt;/mark&gt; requesterId):
+if requestTerm &gt;= currentTerm &amp;&amp; (currentTermVotedFor == null || currentTermVotedFor == requesterId):
 	// This is a term which I haven&#39;t voted in
 	
 	if myLastLogEntryIndex &lt;= requestLastLogEntryIndex &amp;&amp; myLastLogEntryTerm &lt;= requestLastLogEntryTerm:
@@ -122,6 +122,12 @@ Usually, this second message is piggybacked on some other replication message, o
 
     </div>
 
+    
+        <div class="tags">
+            
+                <a href="https://shashank-93rao.github.io/tags/consensus">consensus</a>
+            
+        </div>
     
     
     

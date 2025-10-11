@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Gcp on /home/shashankrao/</title>
-    <link>https://shashank-93rao.github.io/tags/gcp/</link>
-    <description>Recent content in Gcp on /home/shashankrao/</description>
+    <title>Database on /home/shashankrao/</title>
+    <link>https://shashank-93rao.github.io/tags/database/</link>
+    <description>Recent content in Database on /home/shashankrao/</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 06 Sep 2024 10:54:51 +0530</lastBuildDate>
-    <atom:link href="https://shashank-93rao.github.io/tags/gcp/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://shashank-93rao.github.io/tags/database/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Let&#39;s dive into Bigtable</title>
       <link>https://shashank-93rao.github.io/posts/bigtable/</link>

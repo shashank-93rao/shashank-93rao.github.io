@@ -2,6 +2,8 @@
 title: Multi Paxos
 date: 2025-09-29T22:11:41+05:30
 draft: "false"
+tags:
+  - consensus
 ---
 Multi Paxos is another [Consensus]({{< ref "Consensus" >}}) algorithm that's built on top of [Paxos]({{< ref "Paxos" >}}).
 

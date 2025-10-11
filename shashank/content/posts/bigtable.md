@@ -1,13 +1,13 @@
 ---
-title: "Let's dive into Bigtable"
+title: Let's dive into Bigtable
 date: 2024-09-06T10:54:51+05:30
 draft: false
-tags: 
- - GCP
- - Databases
+tags:
+  - gcp
+  - database
 ---
 
-Bigtable is a super fast, distributed storage system built to handle loads of structured data—think petabytes worth—while keeping things quick and responsive. It's the engine behind many Google products you know and love, like Google Analytics and Google Earth.
+Bigtable is a superfast, distributed storage system built to handle loads of structured data—think petabytes worth—while keeping things quick and responsive. It's the engine behind many Google products you know and love, like Google Analytics and Google Earth.
 
 In this post, I'll break down the key points from the original Google Bigtable paper. If you're up for some deeper reading, I've linked the full paper at the end—definitely worth a look!
 
@@ -51,7 +51,7 @@ Metadata tablet files, in turn, contain the locations of the user tablet data fi
 
 Finally, the user tablets hold the actual SSTables and Write-Ahead Log (WAL) files where the user data is stored.
 
-![Tablets and Tablet Assignment](/images/bigtable-tablets.png)
+![Image](/images/bigtable-tablets.png)
 
 
 ### Tablet Assignment
@@ -62,7 +62,7 @@ The master server also routinely checks the health of each tablet server. If a s
 If the master server loses its own lock, it also shuts itself down. When a new master server is brought online by the cluster management system, it acquires an exclusive lock to announce it’s up and running. The new master then checks with Chubby to find the list of active tablet servers. It queries these servers to figure out which tablets have already been assigned and checks the metadata tablets to identify any unassigned tablets that need attention. For the master server to read these metadata tablets, they need to be loaded by the tablet servers. So, the master first checks if the root tablet is unassigned, verifies the assignments of all servers, and assigns the root tablet if necessary.
 
 Clients cache the location of the tablets and directly query the tablet servers, so data transfer between clients and tablets doesn’t go through the master server. This setup ensures that the master server isn't bogged down with too much load.
-![Tablets and Tablet Assignment](/images/bigtable-assignment.png)
+![Image](/images//bigtable-assignment.png)
 
 ## Reading and writing data
 
@@ -72,7 +72,7 @@ The commit log is an append-only file that keeps track of every write operation.
 
 The process of flushing the memtable to an SSTable is called a "minor compaction" and it creates new SSTables. From time to time, Bigtable also performs a "major compaction", where it merges multiple SSTables into one. This process combines all the changes made to the same key across multiple SSTables into a single entry, reducing the overall number of SSTables.
 
-![User Tablet](/images/user-tablet.png)
+![Image](/images/user-tablet.png)
 
 ## Optimizations
 ### Locality Groups
