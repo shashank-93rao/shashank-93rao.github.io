@@ -74,11 +74,11 @@ What&rsquo;s the goal of a data warehouse? 🔗Users of data warehouses often ne
     <div class="content">
       <p>Snowflake is one of the most popular data warehouses. It operates at petabytes of data scale.
 <a href="https://www.cs.cmu.edu/~15721-f24/papers/Snowflake.pdf" target="_blank" rel="noopener">Read detailed paper here</a></p>
-<h5 id="whats-the-goal-of-a-data-warehouse">What&rsquo;s the goal of a data warehouse? <a href="#whats-the-goal-of-a-data-warehouse" class="anchor">🔗</a></h5><p>Users of data warehouses often need to analyse vast amounts of data efficiently. A data warehouse typically comprises multiple compute nodes that work in parallel to process this data. The primary goal is to distribute computing resources effectively to analyse data swiftly whilst minimising unnecessary data movement between nodes, ensuring optimal performance and resource utilisation.</p>
+<h2 id="whats-the-goal-of-a-data-warehouse">What&rsquo;s the goal of a data warehouse? <a href="#whats-the-goal-of-a-data-warehouse" class="anchor">🔗</a></h2><p>Users of data warehouses often need to analyse vast amounts of data efficiently. A data warehouse typically comprises multiple compute nodes that work in parallel to process this data. The primary goal is to distribute computing resources effectively to analyse data swiftly whilst minimising unnecessary data movement between nodes, ensuring optimal performance and resource utilisation.</p>
 <p><p class="markdown-image">
   <img src="/images/warehouse.png" alt="Image"  />
 </p></p>
-<h5 id="snowflake-architecture">Snowflake Architecture <a href="#snowflake-architecture" class="anchor">🔗</a></h5><p>Snowflake has 3 layers</p>
+<h2 id="snowflake-architecture">Snowflake Architecture <a href="#snowflake-architecture" class="anchor">🔗</a></h2><p>Snowflake has 3 layers</p>
 <pre tabindex="0"><code>                  +--------------------------------------+
                  |           Cloud Services             |
                  |  (Metadata, Security, WebUI, etc.)  |
@@ -130,14 +130,14 @@ What&rsquo;s the goal of a data warehouse? 🔗Users of data warehouses often ne
 </ul>
 </li>
 </ol>
-<h6 id="availability">Availability <a href="#availability" class="anchor">🔗</a></h6><ul>
+<h3 id="availability">Availability <a href="#availability" class="anchor">🔗</a></h3><ul>
 <li>Snowflake deploys its control plane services in multiple AZs behind load balancers. If a node fails, it can be simply retried in a different zone.</li>
 <li>The metadata store is also distributed across multiple AZs. Snowflake <a href="https://www.snowflake.com/en/blog/how-foundationdb-powers-snowflake-metadata-forward/" target="_blank" rel="noopener">uses FoundationDB</a> which is a distributed, ACID compliant KV store.</li>
 <li>VWs are not spread across AZs. This is simply because spreading nodes between multiple AZs will affect performance since the network latency between different AZs is obviously going to be higher. In case of a complete AZ failure, a new warehouse will have to be spun up.</li>
 <li>Storage resilience is taken care by S3 by distributing data storage in multiple AZs.</li>
 <li>Any code update is done in a backward compatible manner. New versions are deployed alongside old version of services. Once the users are switched to newer versions, all new queries will go through new services. Once all the customers are switched to new versions and there are no takers for old services, they are shut down.</li>
 </ul>
-<h6 id="time-travel">Time Travel <a href="#time-travel" class="anchor">🔗</a></h6><ul>
+<h3 id="time-travel">Time Travel <a href="#time-travel" class="anchor">🔗</a></h3><ul>
 <li>Since all data files are immutable, old versions of data can be queried up to a certain period beyond which they are deleted. This period can be configured.</li>
 <li>At any point in time, users can restore old data (say if a table was deleted by mistake).</li>
 <li>This immutability also helps with a feature called cloning. Snowflake provides a feature called Clone, which creates a new table out of an existing table. The cloned table and the source table point to the same data files. Hence, cloning becomes very quick. On modifications, new files are created and the metadata is updated.</li>

@@ -10,12 +10,12 @@ tags:
 Snowflake is one of the most popular data warehouses. It operates at petabytes of data scale.
 [Read detailed paper here](https://www.cs.cmu.edu/~15721-f24/papers/Snowflake.pdf)
 
-##### What's the goal of a data warehouse?
+## What's the goal of a data warehouse?
 Users of data warehouses often need to analyse vast amounts of data efficiently. A data warehouse typically comprises multiple compute nodes that work in parallel to process this data. The primary goal is to distribute computing resources effectively to analyse data swiftly whilst minimising unnecessary data movement between nodes, ensuring optimal performance and resource utilisation.
 
 ![Image](/images/warehouse.png)
 
-##### Snowflake Architecture
+## Snowflake Architecture
 Snowflake has 3 layers
 
 ```
@@ -62,14 +62,14 @@ Snowflake has 3 layers
 	* Snowflake uses snapshot isolation along with MVCC. When the query begins, it looks at the latest files that have been written by worker nodes.
 	* Pruning: Snowflake maintains statistics around each file so that it can reduce the number of files to be scanned based on the query conditions.
 
-###### Availability
+### Availability
 * Snowflake deploys its control plane services in multiple AZs behind load balancers. If a node fails, it can be simply retried in a different zone.
 * The metadata store is also distributed across multiple AZs. Snowflake [uses FoundationDB](https://www.snowflake.com/en/blog/how-foundationdb-powers-snowflake-metadata-forward/) which is a distributed, ACID compliant KV store. 
 * VWs are not spread across AZs. This is simply because spreading nodes between multiple AZs will affect performance since the network latency between different AZs is obviously going to be higher. In case of a complete AZ failure, a new warehouse will have to be spun up.
 * Storage resilience is taken care by S3 by distributing data storage in multiple AZs.
 * Any code update is done in a backward compatible manner. New versions are deployed alongside old version of services. Once the users are switched to newer versions, all new queries will go through new services. Once all the customers are switched to new versions and there are no takers for old services, they are shut down.
 
-###### Time Travel
+### Time Travel
 * Since all data files are immutable, old versions of data can be queried up to a certain period beyond which they are deleted. This period can be configured. 
 * At any point in time, users can restore old data (say if a table was deleted by mistake).
 * This immutability also helps with a feature called cloning. Snowflake provides a feature called Clone, which creates a new table out of an existing table. The cloned table and the source table point to the same data files. Hence, cloning becomes very quick. On modifications, new files are created and the metadata is updated.
