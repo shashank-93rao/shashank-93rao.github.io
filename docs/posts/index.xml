@@ -6,8 +6,15 @@
     <description>Recent content in Posts on /home/shashankrao/</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 30 Sep 2025 21:48:51 +0530</lastBuildDate>
+    <lastBuildDate>Fri, 24 Oct 2025 08:39:03 +0530</lastBuildDate>
     <atom:link href="https://shashank-93rao.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Snowflake</title>
+      <link>https://shashank-93rao.github.io/posts/snowflake/</link>
+      <pubDate>Fri, 24 Oct 2025 08:39:03 +0530</pubDate>
+      <guid>https://shashank-93rao.github.io/posts/snowflake/</guid>
+      <description>&lt;p&gt;Snowflake is one of the most popular data warehouses. It operates at petabytes of data scale.&#xA;&lt;a href=&#34;https://www.cs.cmu.edu/~15721-f24/papers/Snowflake.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Read detailed paper here&lt;/a&gt;&lt;/p&gt;&#xA;&lt;h5 id=&#34;whats-the-goal-of-a-data-warehouse&#34;&gt;What&amp;rsquo;s the goal of a data warehouse? &lt;a href=&#34;#whats-the-goal-of-a-data-warehouse&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h5&gt;&lt;p&gt;Users of data warehouses often need to analyse vast amounts of data efficiently. A data warehouse typically comprises multiple compute nodes that work in parallel to process this data. The primary goal is to distribute computing resources effectively to analyse data swiftly whilst minimising unnecessary data movement between nodes, ensuring optimal performance and resource utilisation.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Raft</title>
       <link>https://shashank-93rao.github.io/posts/raft/</link>
@@ -48,7 +55,7 @@
       <link>https://shashank-93rao.github.io/posts/setup/</link>
       <pubDate>Sun, 01 Sep 2024 09:31:51 +0530</pubDate>
       <guid>https://shashank-93rao.github.io/posts/setup/</guid>
-      <description>&lt;p&gt;I’ve always wanted to set up a vanity blog to showcase anything cool and awesome that I’ve worked on. Having seen a couple of my friends write blogs on WordPress and Blogger, these two blogging sites were the first to pop into my mind. However, for a simple use-case like mine, it seemed complicated and unnecessary. All I needed was a domain, a place to host my content, and an HTML generator to turn simple text into beautiful HTML.&lt;/p&gt;</description>
+      <description>&lt;p&gt;I’ve always wanted a space to document the things I learn — somewhere I could easily revisit my notes without digging through random folders and files. Over time, I realised that instead of keeping all this information buried in a notepad, I might as well publish it. It not only gives me a cleaner way to organise what I learn, but also helps others who might be searching for the same thing one day. And that’s how this blog idea began.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
