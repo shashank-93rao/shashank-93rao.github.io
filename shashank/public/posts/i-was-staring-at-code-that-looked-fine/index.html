@@ -6,7 +6,7 @@
     <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
 <meta name="viewport" content="width=device-width,minimum-scale=1">
-<meta name="description" content="I Was Staring At Code That Looked Fine 🔗I&rsquo;m an engineer at Hevo, and a big part of my job is making sure our ETL pipelines are fast. As part of a benchmarking exercise on the pipeline engine, I was profiling ingestion, mapping, and load separately to find out exactly where time was going. The destination mapper stood out — it&rsquo;s the component responsible for converting every field of every row from our internal type system into destination-specific strings for CSV output.">
+<meta name="description" content="I&rsquo;m an engineer at Hevo, and a big part of my job is making sure our ETL pipelines are fast. As part of a benchmarking exercise on the pipeline engine, I was profiling ingestion, mapping, and load separately to find out exactly where time was going. The destination mapper stood out — it&rsquo;s the component responsible for converting every field of every row from our internal type system into destination-specific strings for CSV output.">
 <meta name="generator" content="Hugo 0.134.1">
 
 
@@ -55,7 +55,7 @@
           ·
         </span>
         <span>
-          4255 words
+          4247 words
         </span>
         <span class="split">
           ·
@@ -70,7 +70,7 @@
 
 
     <div class="content">
-      <h1 id="i-was-staring-at-code-that-looked-fine">I Was Staring At Code That Looked Fine <a href="#i-was-staring-at-code-that-looked-fine" class="anchor">🔗</a></h1><p>I&rsquo;m an engineer at <a href="https://hevodata.com/" target="_blank" rel="noopener">Hevo</a>, and a big part of my job is making sure our ETL pipelines are fast. As part of a benchmarking exercise on the pipeline engine, I was profiling ingestion, mapping, and load separately to find out exactly where time was going. The destination mapper stood out — it&rsquo;s the component responsible for converting every field of every row from our internal type system into destination-specific strings for CSV output.</p>
+      <p>I&rsquo;m an engineer at <a href="https://hevodata.com/" target="_blank" rel="noopener">Hevo</a>, and a big part of my job is making sure our ETL pipelines are fast. As part of a benchmarking exercise on the pipeline engine, I was profiling ingestion, mapping, and load separately to find out exactly where time was going. The destination mapper stood out — it&rsquo;s the component responsible for converting every field of every row from our internal type system into destination-specific strings for CSV output.</p>
 <p>So I attached a <strong>JFR</strong> (Java Flight Recorder) recording to the process. JFR is a low-overhead profiling tool built into the JVM — it records heap allocations, GC events, and CPU hot spots with almost no runtime cost. The allocation flame graph pointed straight at the data conversion loop.</p>
 <p>The code looked completely fine. Clean, readable, easy to follow. The kind of code you&rsquo;d approve in a PR without a second thought.</p>
 <p>That&rsquo;s usually when things get interesting.</p>

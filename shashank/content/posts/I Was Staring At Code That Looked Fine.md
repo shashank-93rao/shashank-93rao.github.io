@@ -8,9 +8,6 @@ tags:
   - jvm
   - jit
 ---
-
-# I Was Staring At Code That Looked Fine
-
 I'm an engineer at [Hevo](https://hevodata.com/), and a big part of my job is making sure our ETL pipelines are fast. As part of a benchmarking exercise on the pipeline engine, I was profiling ingestion, mapping, and load separately to find out exactly where time was going. The destination mapper stood out — it's the component responsible for converting every field of every row from our internal type system into destination-specific strings for CSV output.
 
 So I attached a **JFR** (Java Flight Recorder) recording to the process. JFR is a low-overhead profiling tool built into the JVM — it records heap allocations, GC events, and CPU hot spots with almost no runtime cost. The allocation flame graph pointed straight at the data conversion loop.
