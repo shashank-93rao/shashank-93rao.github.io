@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Optimisation on /home/shashankrao/</title>
+    <link>http://localhost:1313/tags/optimisation/</link>
+    <description>Recent content in Optimisation on /home/shashankrao/</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 25 Apr 2026 11:49:45 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/optimisation/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Benchmarking Hevo’s Pipeline Engine</title>
+      <link>http://localhost:1313/posts/benchmarking-hevos-pipeline-engine/</link>
+      <pubDate>Sat, 25 Apr 2026 11:49:45 +0530</pubDate>
+      <guid>http://localhost:1313/posts/benchmarking-hevos-pipeline-engine/</guid>
+      <description>&lt;p&gt;At Hevo, I recently worked on an initiative around benchmarking and optimising our pipeline&amp;rsquo;s performance. We&amp;rsquo;ve published it as a public technical blog.&lt;/p&gt;&#xA;&lt;p&gt;The post walks through how pipeline performance can be evaluated and why benchmarking matters when teams care about throughput, latency, and reliability in data movement.&lt;/p&gt;&#xA;&lt;p&gt;If you work with data pipelines, ETL/ELT systems, or large-scale ingestion workloads, this is a useful read:&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://hevodata.com/learn/benchmarking-hevo-pipeline-performance/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Benchmarking Hevo Pipeline Performance&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

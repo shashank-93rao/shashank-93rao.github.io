@@ -2,45 +2,66 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on /home/shashankrao/</title>
-    <link>https://shashank-93rao.github.io/tags/</link>
+    <link>http://localhost:1313/tags/</link>
     <description>Recent content in Tags on /home/shashankrao/</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 24 Oct 2025 08:39:03 +0530</lastBuildDate>
-    <atom:link href="https://shashank-93rao.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 25 Apr 2026 11:49:45 +0530</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hevo</title>
+      <link>http://localhost:1313/tags/hevo/</link>
+      <pubDate>Sat, 25 Apr 2026 11:49:45 +0530</pubDate>
+      <guid>http://localhost:1313/tags/hevo/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Optimisation</title>
+      <link>http://localhost:1313/tags/optimisation/</link>
+      <pubDate>Sat, 25 Apr 2026 11:49:45 +0530</pubDate>
+      <guid>http://localhost:1313/tags/optimisation/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Performance</title>
+      <link>http://localhost:1313/tags/performance/</link>
+      <pubDate>Sat, 25 Apr 2026 11:49:45 +0530</pubDate>
+      <guid>http://localhost:1313/tags/performance/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Database</title>
-      <link>https://shashank-93rao.github.io/tags/database/</link>
+      <link>http://localhost:1313/tags/database/</link>
       <pubDate>Fri, 24 Oct 2025 08:39:03 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/tags/database/</guid>
+      <guid>http://localhost:1313/tags/database/</guid>
       <description></description>
     </item>
     <item>
       <title>Warehouse</title>
-      <link>https://shashank-93rao.github.io/tags/warehouse/</link>
+      <link>http://localhost:1313/tags/warehouse/</link>
       <pubDate>Fri, 24 Oct 2025 08:39:03 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/tags/warehouse/</guid>
+      <guid>http://localhost:1313/tags/warehouse/</guid>
       <description></description>
     </item>
     <item>
       <title>Consensus</title>
-      <link>https://shashank-93rao.github.io/tags/consensus/</link>
+      <link>http://localhost:1313/tags/consensus/</link>
       <pubDate>Tue, 30 Sep 2025 21:48:51 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/tags/consensus/</guid>
+      <guid>http://localhost:1313/tags/consensus/</guid>
       <description></description>
     </item>
     <item>
       <title>Gcp</title>
-      <link>https://shashank-93rao.github.io/tags/gcp/</link>
+      <link>http://localhost:1313/tags/gcp/</link>
       <pubDate>Fri, 06 Sep 2024 10:54:51 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/tags/gcp/</guid>
+      <guid>http://localhost:1313/tags/gcp/</guid>
       <description></description>
     </item>
     <item>
       <title>Misc</title>
-      <link>https://shashank-93rao.github.io/tags/misc/</link>
+      <link>http://localhost:1313/tags/misc/</link>
       <pubDate>Sun, 01 Sep 2024 09:31:51 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/tags/misc/</guid>
+      <guid>http://localhost:1313/tags/misc/</guid>
       <description></description>
     </item>
   </channel>

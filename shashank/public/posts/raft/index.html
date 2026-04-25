@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head>
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
     <title>Raft | /home/shashankrao/</title>
 
     <meta charset="utf-8">
@@ -72,8 +72,8 @@ Raft&rsquo;s usage is to replicate the sequence of state changes in distributed 
 
 
     <div class="content">
-      <p>Raft is one of the most popular <a href="https://shashank-93rao.github.io/posts/consensus/">Consensus</a> algorithm that&rsquo;s present today. Can read more about it <a href="https://raft.github.io/raft.pdf" target="_blank" rel="noopener">here</a>.</p>
-<p>Built as an alternative to the <a href="https://shashank-93rao.github.io/posts/paxos/">Paxos</a> group of algorithms, it is built mainly to simplify the understanding of consensus algorithm.</p>
+      <p>Raft is one of the most popular <a href="http://localhost:1313/posts/consensus/">Consensus</a> algorithm that&rsquo;s present today. Can read more about it <a href="https://raft.github.io/raft.pdf" target="_blank" rel="noopener">here</a>.</p>
+<p>Built as an alternative to the <a href="http://localhost:1313/posts/paxos/">Paxos</a> group of algorithms, it is built mainly to simplify the understanding of consensus algorithm.</p>
 <p>Raft&rsquo;s usage is to replicate the sequence of state changes in distributed machines. These states are stored in a log and then applied by the state machines to derive the final state. If the order of the states is correct, then all machines will have the correct state.</p>
 <p>Understanding Raft can be split across multiple concepts</p>
 <h3 id="leader-election">Leader Election <a href="#leader-election" class="anchor">🔗</a></h3><p>At any point of time, a node is either a leader, a follower, or a candidate. A node frequently receives a heartbeat from the leader. If the heartbeat isn&rsquo;t received within the <em>election timeout</em>, then it initiates the election.</p>
@@ -125,7 +125,7 @@ Usually, this second message is piggybacked on some other replication message, o
     
         <div class="tags">
             
-                <a href="https://shashank-93rao.github.io/tags/consensus">consensus</a>
+                <a href="http://localhost:1313/tags/consensus">consensus</a>
             
         </div>
     

@@ -6,7 +6,7 @@ author = "Shashank Rao"
 enableComments = false
 +++
 
-Welcome to my blog! I’m Shashank, a  software engineer currently working at [Hevo Data](https://hevodata.com/). This space is my personal notebook where I document everything that I learn. Follow along as I document my continuous learning process.
+Welcome to my blog! I’m Shashank, a  software engineer currently working at [Hevo Data](https://hevodata.com/). This space is my personal notebook where I document everything that I learn. Follow along as I document my continuous learnings.
 
 Feel free to connect with me on [LinkedIn](https://www.linkedin.com/in/shashank93rao/)
 
