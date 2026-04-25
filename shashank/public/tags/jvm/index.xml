@@ -1,26 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Performance on /home/shashankrao/</title>
-    <link>https://shashank-93rao.github.io/tags/performance/</link>
-    <description>Recent content in Performance on /home/shashankrao/</description>
+    <title>Jvm on /home/shashankrao/</title>
+    <link>https://shashank-93rao.github.io/tags/jvm/</link>
+    <description>Recent content in Jvm on /home/shashankrao/</description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Sat, 25 Apr 2026 20:08:01 +0530</lastBuildDate>
-    <atom:link href="https://shashank-93rao.github.io/tags/performance/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://shashank-93rao.github.io/tags/jvm/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>I Was Staring At Code That Looked Fine — JFR Said Optimise Every Line</title>
       <link>https://shashank-93rao.github.io/posts/i-was-staring-at-code-that-looked-fine/</link>
       <pubDate>Sat, 25 Apr 2026 20:08:01 +0530</pubDate>
       <guid>https://shashank-93rao.github.io/posts/i-was-staring-at-code-that-looked-fine/</guid>
       <description>&lt;h1 id=&#34;i-was-staring-at-code-that-looked-fine&#34;&gt;I Was Staring At Code That Looked Fine &lt;a href=&#34;#i-was-staring-at-code-that-looked-fine&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h1&gt;&lt;p&gt;I&amp;rsquo;m an engineer at &lt;a href=&#34;https://hevodata.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hevo&lt;/a&gt;, and a big part of my job is making sure our ETL pipelines are fast. As part of a benchmarking exercise on the pipeline engine, I was profiling ingestion, mapping, and load separately to find out exactly where time was going. The destination mapper stood out — it&amp;rsquo;s the component responsible for converting every field of every row from our internal type system into destination-specific strings for CSV output.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>Benchmarking Hevo’s Pipeline Engine</title>
-      <link>https://shashank-93rao.github.io/posts/benchmarking-hevos-pipeline-engine/</link>
-      <pubDate>Sat, 25 Apr 2026 11:49:45 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/posts/benchmarking-hevos-pipeline-engine/</guid>
-      <description>&lt;p&gt;At Hevo, I recently worked on an initiative around benchmarking and optimising our pipeline&amp;rsquo;s performance. We&amp;rsquo;ve published it as a public technical blog.&lt;/p&gt;&#xA;&lt;p&gt;The post walks through how pipeline performance can be evaluated and why benchmarking matters when teams care about throughput, latency, and reliability in data movement.&lt;/p&gt;&#xA;&lt;p&gt;If you work with data pipelines, ETL/ELT systems, or large-scale ingestion workloads, this is a useful read:&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://hevodata.com/learn/benchmarking-hevo-pipeline-performance/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Benchmarking Hevo Pipeline Performance&lt;/a&gt;&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
