@@ -55,7 +55,7 @@
           ·
         </span>
         <span>
-          4292 words
+          4287 words
         </span>
         <span class="split">
           ·
@@ -139,7 +139,7 @@
 <p>But here&rsquo;s the thing: <strong>the schema doesn&rsquo;t change during a processing run.</strong> If column 3 is a DATE column in row 1, it&rsquo;s still a DATE column in row 500,000. The schema is set when the converter is created. The conversion operation for each field is completely determined by the schema alone.</p>
 <p>So we&rsquo;re rediscovering the same answer millions of times. It&rsquo;s like checking whether your front door is locked by walking to it every five minutes, even though you haven&rsquo;t opened it since you left.</p>
 <h3 id="the-fix--precompile-the-schema-into-integer-tags">The Fix — Precompile the Schema Into Integer Tags <a href="#the-fix--precompile-the-schema-into-integer-tags" class="anchor">🔗</a></h3><p>Separate the &ldquo;figure out what to do&rdquo; step from the &ldquo;actually do it&rdquo; step. At construction time, resolve each field&rsquo;s conversion to a simple integer (a &ldquo;tag&rdquo;). At row time, just look the tag up and dispatch off it.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Tag constants — one per conversion operation, dense integers starting at 0</span>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#75715e">// Tag constants — one per conversion operation, continuous integers starting at 0</span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> TAG_DATE    <span style="color:#f92672">=</span> 0;
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> TAG_INTEGER <span style="color:#f92672">=</span> 1;
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">static</span> <span style="color:#66d9ef">final</span> <span style="color:#66d9ef">int</span> TAG_VARCHAR <span style="color:#f92672">=</span> 2;
@@ -180,7 +180,7 @@
 </span></span><span style="display:flex;"><span>        };
 </span></span><span style="display:flex;"><span>    }
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div><h3 id="why-integers-specifically">Why Integers Specifically? <a href="#why-integers-specifically" class="anchor">🔗</a></h3><p>This is where it gets interesting. When you write <code>switch(tag)</code> with case values <code>0, 1, 2, 3...</code> — dense, contiguous integers — the JVM compiles it to something called a <strong>tableswitch</strong>. Here&rsquo;s what that actually means.</p>
+</span></span></code></pre></div><h3 id="why-integers-specifically">Why Integers Specifically? <a href="#why-integers-specifically" class="anchor">🔗</a></h3><p>This is where it gets interesting. When you write <code>switch(tag)</code> with case values <code>0, 1, 2, 3...</code> — contiguous integers — the JVM compiles it to something called a <strong>tableswitch</strong>. Here&rsquo;s what that actually means.</p>
 <p>The JVM builds a lookup array where:</p>
 <ul>
 <li>index 0 holds the address of the <code>case 0</code> code</li>
@@ -189,9 +189,9 @@
 <li>&hellip;</li>
 </ul>
 <p>When it sees <code>switch(tag)</code>, it just does: &ldquo;jump to the address at <code>jumpTable[tag]</code>.&rdquo; One array lookup. O(1). About 1 CPU cycle. No comparisons. No branching.</p>
-<p>Compare that to the original <code>switch(field.sourceType())</code> on an enum. Enum switches go through an additional indirection of mapping the enum to their ordinal value. The compiler generates this mapping  behind the scenes. And if the case values aren&rsquo;t dense (enum ordinals can have gaps), the JVM falls back to a <code>lookupswitch</code> instruction instead, which does binary search. (worth <a href="https://www.objectos.com.br/blog/java-switch-internals-tableswitch-lookupswitch-instructions.html" target="_blank" rel="noopener">reading about</a> if you haven&rsquo;t seen it before)</p>
-<p><strong>Dense integers starting at 0 are the JVM&rsquo;s fast path.</strong></p>
-<p>If you want to go deeper on how <code>tableswitch</code> and <code>lookupswitch</code> actually work, the <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.tableswitch" target="_blank" rel="noopener">JVM specification</a> has the full picture — it&rsquo;s surprisingly readable for a spec.</p>
+<p>Compare that to the original <code>switch(field.sourceType())</code> on an enum. Enum switches go through an additional indirection of mapping the enum to their ordinal value. The compiler generates this mapping  behind the scenes. And if the case values aren&rsquo;t contiguous (enum ordinals can have gaps), the JVM falls back to a <code>lookupswitch</code> instruction instead, which does binary search. (worth <a href="https://www.objectos.com.br/blog/java-switch-internals-tableswitch-lookupswitch-instructions.html" target="_blank" rel="noopener">reading about</a> if you haven&rsquo;t seen it before)</p>
+<p><strong>Contiguous integers starting at 0 are the JVM&rsquo;s fast path.</strong></p>
+<p>If you want to go deeper on how <code>tableswitch</code> and <code>lookupswitch</code> actually work, you can go read the JVM Spec <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.tableswitch" target="_blank" rel="noopener">here</a> and <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.lookupswitch" target="_blank" rel="noopener">here</a>.</p>
 <p>Try it yourself: compile your class and run <code>javap -c MyClass.class</code>. Look for <code>tableswitch</code> vs <code>lookupswitch</code> in the bytecode output. <code>tableswitch</code> is what you want.</p>
 <pre tabindex="0"><code>// What you want to see in javap output:
 7: tableswitch   { // 0 to 2
@@ -473,8 +473,8 @@ Integer switch → one concrete class   → monomorphic        → JIT inlines e
 <h2 id="so-what-did-we-actually-learn">So What Did We Actually Learn? <a href="#so-what-did-we-actually-learn" class="anchor">🔗</a></h2><p>Let me boil it down:</p>
 <p><strong>1. Move invariant work out of the loop.</strong>
 If a computation&rsquo;s inputs don&rsquo;t change between iterations, compute it once before the loop. This sounds obvious but it&rsquo;s easy to miss when the &ldquo;invariant input&rdquo; is a schema or a type — something that feels like metadata rather than data.</p>
-<p><strong>2. Dense integer switches compile to jump tables.</strong>
-<code>switch</code> on enum or string is not the same as <code>switch</code> on a dense integer. Design your dispatch tags as <code>0, 1, 2, 3...</code> and the JVM will give you O(1) dispatch via tableswitch. Verify with <code>javap -c</code>.</p>
+<p><strong>2. Contiguous integer switches compile to jump tables.</strong>
+<code>switch</code> on enum or string is not the same as <code>switch</code> on a contiguous integers. Design your dispatch tags as <code>0, 1, 2, 3...</code> and the JVM will give you O(1) dispatch via tableswitch. Verify with <code>javap -c</code>.</p>
 <p><strong>3. Lambda arrays create megamorphic call sites.</strong>
 When a single call site sees more than ~2 concrete types, the JIT stops inlining. An array of N different lambdas is guaranteed megamorphic. One concrete class with an internal integer switch is monomorphic — the JIT can inline the whole thing.</p>
 <p><strong>4. Pre-allocate fixed-size result containers.</strong>

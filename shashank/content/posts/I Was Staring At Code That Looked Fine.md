@@ -101,7 +101,7 @@ So we're rediscovering the same answer millions of times. It's like checking whe
 Separate the "figure out what to do" step from the "actually do it" step. At construction time, resolve each field's conversion to a simple integer (a "tag"). At row time, just look the tag up and dispatch off it.
 
 ```java
-// Tag constants — one per conversion operation, dense integers starting at 0
+// Tag constants — one per conversion operation, continuous integers starting at 0
 static final int TAG_DATE    = 0;
 static final int TAG_INTEGER = 1;
 static final int TAG_VARCHAR = 2;
@@ -146,7 +146,7 @@ class DataConverter {
 
 ### Why Integers Specifically?
 
-This is where it gets interesting. When you write `switch(tag)` with case values `0, 1, 2, 3...` — dense, contiguous integers — the JVM compiles it to something called a **tableswitch**. Here's what that actually means.
+This is where it gets interesting. When you write `switch(tag)` with case values `0, 1, 2, 3...` — contiguous integers — the JVM compiles it to something called a **tableswitch**. Here's what that actually means.
 
 The JVM builds a lookup array where:
 - index 0 holds the address of the `case 0` code
@@ -156,11 +156,11 @@ The JVM builds a lookup array where:
 
 When it sees `switch(tag)`, it just does: "jump to the address at `jumpTable[tag]`." One array lookup. O(1). About 1 CPU cycle. No comparisons. No branching.
 
-Compare that to the original `switch(field.sourceType())` on an enum. Enum switches go through an additional indirection of mapping the enum to their ordinal value. The compiler generates this mapping  behind the scenes. And if the case values aren't dense (enum ordinals can have gaps), the JVM falls back to a `lookupswitch` instruction instead, which does binary search. (worth [reading about](https://www.objectos.com.br/blog/java-switch-internals-tableswitch-lookupswitch-instructions.html) if you haven't seen it before)
+Compare that to the original `switch(field.sourceType())` on an enum. Enum switches go through an additional indirection of mapping the enum to their ordinal value. The compiler generates this mapping  behind the scenes. And if the case values aren't contiguous (enum ordinals can have gaps), the JVM falls back to a `lookupswitch` instruction instead, which does binary search. (worth [reading about](https://www.objectos.com.br/blog/java-switch-internals-tableswitch-lookupswitch-instructions.html) if you haven't seen it before)
 
-**Dense integers starting at 0 are the JVM's fast path.**
+**Contiguous integers starting at 0 are the JVM's fast path.**
 
-If you want to go deeper on how `tableswitch` and `lookupswitch` actually work, the [JVM specification](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.tableswitch) has the full picture — it's surprisingly readable for a spec.
+If you want to go deeper on how `tableswitch` and `lookupswitch` actually work, you can go read the JVM Spec [here](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.tableswitch) and [here](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.lookupswitch).
 
 Try it yourself: compile your class and run `javap -c MyClass.class`. Look for `tableswitch` vs `lookupswitch` in the bytecode output. `tableswitch` is what you want.
 
@@ -538,8 +538,8 @@ Let me boil it down:
 **1. Move invariant work out of the loop.**
 If a computation's inputs don't change between iterations, compute it once before the loop. This sounds obvious but it's easy to miss when the "invariant input" is a schema or a type — something that feels like metadata rather than data.
 
-**2. Dense integer switches compile to jump tables.**
-`switch` on enum or string is not the same as `switch` on a dense integer. Design your dispatch tags as `0, 1, 2, 3...` and the JVM will give you O(1) dispatch via tableswitch. Verify with `javap -c`.
+**2. Contiguous integer switches compile to jump tables.**
+`switch` on enum or string is not the same as `switch` on a contiguous integers. Design your dispatch tags as `0, 1, 2, 3...` and the JVM will give you O(1) dispatch via tableswitch. Verify with `javap -c`.
 
 **3. Lambda arrays create megamorphic call sites.**
 When a single call site sees more than ~2 concrete types, the JIT stops inlining. An array of N different lambdas is guaranteed megamorphic. One concrete class with an internal integer switch is monomorphic — the JIT can inline the whole thing.
