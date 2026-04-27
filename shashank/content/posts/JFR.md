@@ -1,20 +1,21 @@
 ---
-title: I Was Staring At Code That Looked Fine — JFR Said Optimise Every Line
+title: "Understanding the JVM's JIT Compiler: Optimising Loops for How It Actually Works"
 date: 2026-04-25T20:08:01+05:30
 draft: "false"
 tags:
-  - Java
   - performance
   - jvm
+  - java
   - jit
+  - jfr
 ---
-I'm an engineer at [Hevo](https://hevodata.com/), and a big part of my job is making sure our data processing pipelines are fast. As part of an initiative to improve the throughput of our pipelines, I was profiling our code to figure out the components that were the bottlenecks. The serialization layer stood out — it's the component responsible for converting every field of every row from our internal typed object model into string representations for CSV output.
+Profiling a high-throughput serialization loop with **JFR** (Java Flight Recorder) surfaced something uncomfortable: the code was slow, and nothing in the code looked wrong.
 
-This kind of pattern shows up everywhere, by the way. Any system that takes typed records and serializes them — REST APIs building JSON responses, exporters writing metrics, message producers, report generators — they all hit the same conversion bottleneck. So while the context here is data pipelines, the optimization lessons apply universally.
+This post is about diagnosing and fixing that — five concrete problems, each one a lesson in how the JVM actually works. It covers: how the JIT decides what to inline (and when it gives up), why integer switches compile to O(1) jump tables while enum switches don't, how to eliminate heap allocations from a tight loop with ThreadLocal, and why `DateTimeFormatter` hides 5-6 allocations per call.
 
-So I attached a **JFR** (Java Flight Recorder) recording to the process. JFR is a low-overhead profiling tool built into the JVM — it records heap allocations, GC events, and CPU hot spots with almost no runtime cost. The allocation flame graph pointed straight at the data conversion loop.
+I'm an engineer at [Hevo](https://hevodata.com/), and this came from profiling our data pipeline engine — but the patterns here aren't specific to pipelines. Any Java system that serializes typed records in a loop will hit the same bottlenecks.
 
-The code looked completely fine. Clean, readable, easy to follow. The kind of code you'd approve in a PR without a second thought.
+So I attached a JFR recording to the process. The allocation flame graph pointed straight at the conversion loop. The code looked completely fine. Clean, readable, easy to follow. The kind of code you'd approve in a PR without a second thought.
 
 That's usually when things get interesting.
 
@@ -86,7 +87,7 @@ I've tagged five spots — `(A)` through `(E)`. Every single one of them is a pr
 
 ---
 
-## Problem 1 — The Schema Never Changes, So Why Are We Checking It Every Row?
+## Problem 1 — Enum Dispatch on a Hot Loop: From lookupswitch to tableswitch
 
 Look at `(B)` and `(C)`.
 
@@ -176,7 +177,7 @@ Try it yourself: compile your class and run `javap -c MyClass.class`. Look for `
 
 ---
 
-## Aside — "Why Not Just Store a Lambda Per Field?"
+## Aside — Lambda Arrays Create Megamorphic Call Sites (And the JIT Stops Inlining)
 
 When I first thought about precompiling the conversions, my instinct was: store a `Function<Datum, String>` per field. One lambda per field, call it at row time. Clean and functional-looking:
 
@@ -379,7 +380,7 @@ Better. But that `new StringBuilder(10)` on every call is still unnecessary. The
 
 ---
 
-## Problem 5 — That `new StringBuilder()` per Call
+## Problem 5 — ThreadLocal StringBuilder: One Allocation Per Thread, Reused Forever
 
 Every `new StringBuilder(10)` allocates a new object on the heap plus a new `char[]` backing array. At 500,000 date fields per batch, you're creating 1 million heap objects to hold data for about 10 nanoseconds.
 
@@ -438,7 +439,7 @@ If you have JFR running, take an allocation recording before and after this chan
 
 ---
 
-## Bonus — The Nanosecond Formatter (Going All the Way Down)
+## Bonus — The Fill-From-Right Trick: Zero-Allocation Integer Formatting (And a JIT Surprise)
 
 For datetime fields with sub-second precision, you need to format nanoseconds. The value is an integer from 0 to 999,999,999, and the formatted output should have trailing zeros stripped: `123000000` → `"123"`, `100000000` → `"1"`, `123456789` → `"123456789"`.
 

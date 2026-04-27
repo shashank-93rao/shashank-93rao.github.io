@@ -68,14 +68,15 @@
         
         <section class="item">
           <div>
-            <h1 class="title"><a href='/posts/i-was-staring-at-code-that-looked-fine/'>I Was Staring At Code That Looked Fine — JFR Said Optimise Every Line</a></h1>
+            <h1 class="title"><a href='/posts/jfr/'>Understanding the JVM&#39;s JIT Compiler: Optimising Loops for How It Actually Works</a></h1>
             <div class ="date">
                 <time datetime="2026-04-25 20:08:01 &#43;0530 IST">Apr 25, 2026</time>  
             </div>
           </div>
 
           
-              <div class="summary">I’m an engineer at Hevo, and a big part of my job is making sure our data processing pipelines are fast. As part of an initiative to improve the throughput of our pipelines, I was profiling our code to figure out the components that were the bottlenecks. The serialization layer stood out — it’s the component responsible for converting every field of every row from our internal typed object model into string representations for CSV output.
+              <div class="summary">Profiling a high-throughput serialization loop with JFR (Java Flight Recorder) surfaced something uncomfortable: the code was slow, and nothing in the code looked wrong.
+This post is about diagnosing and fixing that — five concrete problems, each one a lesson in how the JVM actually works. It covers: how the JIT decides what to inline (and when it gives up), why integer switches compile to O(1) jump tables while enum switches don’t, how to eliminate heap allocations from a tight loop with ThreadLocal, and why DateTimeFormatter hides 5-6 allocations per call.
 </div>
           
 

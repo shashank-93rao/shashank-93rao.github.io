@@ -9,11 +9,11 @@
     <lastBuildDate>Sat, 25 Apr 2026 20:08:01 +0530</lastBuildDate>
     <atom:link href="https://shashank-93rao.github.io/tags/jit/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>I Was Staring At Code That Looked Fine — JFR Said Optimise Every Line</title>
-      <link>https://shashank-93rao.github.io/posts/i-was-staring-at-code-that-looked-fine/</link>
+      <title>Understanding the JVM&#39;s JIT Compiler: Optimising Loops for How It Actually Works</title>
+      <link>https://shashank-93rao.github.io/posts/jfr/</link>
       <pubDate>Sat, 25 Apr 2026 20:08:01 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/posts/i-was-staring-at-code-that-looked-fine/</guid>
-      <description>&lt;p&gt;I&amp;rsquo;m an engineer at &lt;a href=&#34;https://hevodata.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Hevo&lt;/a&gt;, and a big part of my job is making sure our data processing pipelines are fast. As part of an initiative to improve the throughput of our pipelines, I was profiling our code to figure out the components that were the bottlenecks. The serialization layer stood out — it&amp;rsquo;s the component responsible for converting every field of every row from our internal typed object model into string representations for CSV output.&lt;/p&gt;</description>
+      <guid>https://shashank-93rao.github.io/posts/jfr/</guid>
+      <description>&lt;p&gt;Profiling a high-throughput serialization loop with &lt;strong&gt;JFR&lt;/strong&gt; (Java Flight Recorder) surfaced something uncomfortable: the code was slow, and nothing in the code looked wrong.&lt;/p&gt;&#xA;&lt;p&gt;This post is about diagnosing and fixing that — five concrete problems, each one a lesson in how the JVM actually works. It covers: how the JIT decides what to inline (and when it gives up), why integer switches compile to O(1) jump tables while enum switches don&amp;rsquo;t, how to eliminate heap allocations from a tight loop with ThreadLocal, and why &lt;code&gt;DateTimeFormatter&lt;/code&gt; hides 5-6 allocations per call.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
