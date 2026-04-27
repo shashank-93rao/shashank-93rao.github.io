@@ -1,5 +1,5 @@
 ---
-title: "Understanding the JVM's JIT Compiler: Optimising Loops for How It Actually Works"
+title: Writing Code the JVM Wants to Optimise
 date: 2026-04-25T20:08:01+05:30
 draft: "false"
 tags:

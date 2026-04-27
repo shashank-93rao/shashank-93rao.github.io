@@ -9,10 +9,10 @@
     <lastBuildDate>Sat, 25 Apr 2026 20:08:01 +0530</lastBuildDate>
     <atom:link href="https://shashank-93rao.github.io/tags/jit/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Understanding the JVM&#39;s JIT Compiler: Optimising Loops for How It Actually Works</title>
-      <link>https://shashank-93rao.github.io/posts/jfr/</link>
+      <title>Writing Code the JVM Wants to Optimise</title>
+      <link>https://shashank-93rao.github.io/posts/writing-code-the-jvm-wants-to-optimise/</link>
       <pubDate>Sat, 25 Apr 2026 20:08:01 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/posts/jfr/</guid>
+      <guid>https://shashank-93rao.github.io/posts/writing-code-the-jvm-wants-to-optimise/</guid>
       <description>&lt;p&gt;Profiling a high-throughput serialization loop with &lt;strong&gt;JFR&lt;/strong&gt; (Java Flight Recorder) surfaced something uncomfortable: the code was slow, and nothing in the code looked wrong.&lt;/p&gt;&#xA;&lt;p&gt;This post is about diagnosing and fixing that — five concrete problems, each one a lesson in how the JVM actually works. It covers: how the JIT decides what to inline (and when it gives up), why integer switches compile to O(1) jump tables while enum switches don&amp;rsquo;t, how to eliminate heap allocations from a tight loop with ThreadLocal, and why &lt;code&gt;DateTimeFormatter&lt;/code&gt; hides 5-6 allocations per call.&lt;/p&gt;</description>
     </item>
   </channel>
