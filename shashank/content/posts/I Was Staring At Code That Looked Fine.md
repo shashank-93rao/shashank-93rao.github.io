@@ -8,7 +8,9 @@ tags:
   - jvm
   - jit
 ---
-I'm an engineer at [Hevo](https://hevodata.com/), and a big part of my job is making sure our ETL pipelines are fast. As part of a benchmarking exercise on the pipeline engine, I was profiling ingestion, mapping, and load separately to find out exactly where time was going. The destination mapper stood out — it's the component responsible for converting every field of every row from our internal type system into destination-specific strings for CSV output.
+I'm an engineer at [Hevo](https://hevodata.com/), and a big part of my job is making sure our data processing pipelines are fast. As part of an initiative to improve the throughput of our pipelines, I was profiling our code to figure out the components that were the bottlenecks. The serialization layer stood out — it's the component responsible for converting every field of every row from our internal typed object model into string representations for CSV output.
+
+This kind of pattern shows up everywhere, by the way. Any system that takes typed records and serializes them — REST APIs building JSON responses, exporters writing metrics, message producers, report generators — they all hit the same conversion bottleneck. So while the context here is data pipelines, the optimization lessons apply universally.
 
 So I attached a **JFR** (Java Flight Recorder) recording to the process. JFR is a low-overhead profiling tool built into the JVM — it records heap allocations, GC events, and CPU hot spots with almost no runtime cost. The allocation flame graph pointed straight at the data conversion loop.
 
@@ -90,7 +92,7 @@ Look at `(B)` and `(C)`.
 
 `field.sourceType()` returns the type of this field — `DATE`, `INTEGER`, `VARCHAR`, etc. The switch then figures out which conversion function to call. This runs for every field, in every row.
 
-But here's the thing: **the schema doesn't change mid-batch.** If column 3 is a DATE column in row 1, it's still a DATE column in row 500,000. The schema is set when the converter is created. The conversion operation for each field is completely determined by the schema alone.
+But here's the thing: **the schema doesn't change during a processing run.** If column 3 is a DATE column in row 1, it's still a DATE column in row 500,000. The schema is set when the converter is created. The conversion operation for each field is completely determined by the schema alone.
 
 So we're rediscovering the same answer millions of times. It's like checking whether your front door is locked by walking to it every five minutes, even though you haven't opened it since you left.
 
@@ -526,8 +528,6 @@ But the headline number: **iterations per second on the conversion loop went up 
 Not 10%. Ten times. The same code, doing the same thing, on the same hardware.
 
 That number surprised me too, honestly. But it makes sense when you think about it. Every optimization here eliminated work that was running on every single field of every single row. The effects compound. You eliminate the schema lookup, and the JIT can now see a monomorphic call site and inline more aggressively. You eliminate the allocations, and the GC runs less, which means fewer stop-the-world pauses disrupting the loop. Each fix made the next fix more impactful.
-
-The customer's historical load finished in roughly a tenth of the original time.
 
 ---
 
