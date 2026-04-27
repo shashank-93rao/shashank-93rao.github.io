@@ -160,7 +160,7 @@ Compare that to the original `switch(field.sourceType())` on an enum. Enum switc
 
 **Contiguous integers starting at 0 are the JVM's fast path.**
 
-If you want to go deeper on how `tableswitch` and `lookupswitch` actually work, you can go read the JVM Spec [here](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.tableswitch) and [here](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.lookupswitch).
+If you want to learn more about how tableswitch and lookupswitch work, you can go read the JVM Spec [here](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.tableswitch) and [here](https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.lookupswitch).
 
 Try it yourself: compile your class and run `javap -c MyClass.class`. Look for `tableswitch` vs `lookupswitch` in the bytecode output. `tableswitch` is what you want.
 

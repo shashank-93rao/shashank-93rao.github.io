@@ -55,7 +55,7 @@
           ·
         </span>
         <span>
-          4287 words
+          4286 words
         </span>
         <span class="split">
           ·
@@ -191,7 +191,7 @@
 <p>When it sees <code>switch(tag)</code>, it just does: &ldquo;jump to the address at <code>jumpTable[tag]</code>.&rdquo; One array lookup. O(1). About 1 CPU cycle. No comparisons. No branching.</p>
 <p>Compare that to the original <code>switch(field.sourceType())</code> on an enum. Enum switches go through an additional indirection of mapping the enum to their ordinal value. The compiler generates this mapping  behind the scenes. And if the case values aren&rsquo;t contiguous (enum ordinals can have gaps), the JVM falls back to a <code>lookupswitch</code> instruction instead, which does binary search. (worth <a href="https://www.objectos.com.br/blog/java-switch-internals-tableswitch-lookupswitch-instructions.html" target="_blank" rel="noopener">reading about</a> if you haven&rsquo;t seen it before)</p>
 <p><strong>Contiguous integers starting at 0 are the JVM&rsquo;s fast path.</strong></p>
-<p>If you want to go deeper on how <code>tableswitch</code> and <code>lookupswitch</code> actually work, you can go read the JVM Spec <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.tableswitch" target="_blank" rel="noopener">here</a> and <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.lookupswitch" target="_blank" rel="noopener">here</a>.</p>
+<p>If you want to learn more about how tableswitch and lookupswitch work, you can go read the JVM Spec <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.tableswitch" target="_blank" rel="noopener">here</a> and <a href="https://docs.oracle.com/javase/specs/jvms/se21/html/jvms-6.html#jvms-6.5.lookupswitch" target="_blank" rel="noopener">here</a>.</p>
 <p>Try it yourself: compile your class and run <code>javap -c MyClass.class</code>. Look for <code>tableswitch</code> vs <code>lookupswitch</code> in the bytecode output. <code>tableswitch</code> is what you want.</p>
 <pre tabindex="0"><code>// What you want to see in javap output:
 7: tableswitch   { // 0 to 2
