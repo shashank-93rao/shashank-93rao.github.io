@@ -68,6 +68,23 @@
         
         <section class="item">
           <div>
+            <h1 class="title"><a href='/posts/the-blind-spot-in-just-take-a-jfr--why-cpu-hot-profiling-misses-queue-backpressure/'>JFR Blindspots</a></h1>
+            <div class ="date">
+                <time datetime="2026-08-19 14:10:50 &#43;0530 IST">Aug 19, 2026</time>  
+            </div>
+          </div>
+
+          
+              <div class="summary">TL;DR 🔗Java Flight Recorder’s default profiling configuration (the profile template — what you get from JMC’s “Start Flight Recording” wizard, most “attach and capture” tooling, and JFR-mode async-profiler runs out of the box) is CPU-sampling biased. It’s great at answering “what is the CPU busy doing” and borderline useless at answering “what is this thread actually waiting on,” because every blocking or duration-based event — thread parks, monitor waits, socket reads, file writes — is threshold-gated, typically at 10–20ms. Anything faster than that threshold is treated as beneath notice and never gets recorded. Which is a problem, because backpressure, fast retries, and hot-but-brief locks all live comfortably under that threshold, having a party JFR doesn’t know is happening.
+</div>
+          
+
+        </section>
+    
+        
+        
+        <section class="item">
+          <div>
             <h1 class="title"><a href='/posts/writing-code-the-jvm-wants-to-optimise/'>Writing Code the JVM Wants to Optimise</a></h1>
             <div class ="date">
                 <time datetime="2026-04-25 20:08:01 &#43;0530 IST">Apr 25, 2026</time>  

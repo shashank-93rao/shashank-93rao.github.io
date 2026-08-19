@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>JFR Blindspots | /home/shashankrao/</title>
+
+    <meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">    
+<meta name="viewport" content="width=device-width,minimum-scale=1">
+<meta name="description" content="TL;DR 🔗Java Flight Recorder&rsquo;s default profiling configuration (the profile template — what you get from JMC&rsquo;s &ldquo;Start Flight Recording&rdquo; wizard, most &ldquo;attach and capture&rdquo; tooling, and JFR-mode async-profiler runs out of the box) is CPU-sampling biased. It&rsquo;s great at answering &ldquo;what is the CPU busy doing&rdquo; and borderline useless at answering &ldquo;what is this thread actually waiting on,&rdquo; because every blocking or duration-based event — thread parks, monitor waits, socket reads, file writes — is threshold-gated, typically at 10–20ms. Anything faster than that threshold is treated as beneath notice and never gets recorded. Which is a problem, because backpressure, fast retries, and hot-but-brief locks all live comfortably under that threshold, having a party JFR doesn&rsquo;t know is happening.">
+<meta name="generator" content="Hugo 0.134.1">
+
+
+  <META NAME="ROBOTS" CONTENT="NOINDEX, NOFOLLOW">
+
+
+<link rel="stylesheet" href="/css/style.css">
+
+
+
+<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon" />
+
+
+
+
+
+
+
+
+  </head>
+
+  <body>
+    <nav class="navigation">
+	
+		<a href="/"> <span class="arrow">←</span>Home</a>
+	
+	<a href="/posts">Archive</a>
+	<a href="/tags">Tags</a>
+	<a href="/about">About</a>
+
+	
+
+	
+</nav>
+
+
+    <main class="main">
+      
+
+<section id="single">
+    <h1 class="title">JFR Blindspots</h1>
+
+    <div class="tip">
+        <time datetime="2026-08-19 14:10:50 &#43;0530 IST">Aug 19, 2026</time>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          1976 words
+        </span>
+        <span class="split">
+          ·
+        </span>
+        <span>
+          10 minute read
+        </span>
+    </div>
+
+    
+    
+
+
+    <div class="content">
+      <h2 id="tldr">TL;DR <a href="#tldr" class="anchor">🔗</a></h2><p>Java Flight Recorder&rsquo;s default profiling configuration (the <code>profile</code> template — what you get from JMC&rsquo;s &ldquo;Start Flight Recording&rdquo; wizard, most &ldquo;attach and capture&rdquo; tooling, and JFR-mode <code>async-profiler</code> runs out of the box) is CPU-sampling biased. It&rsquo;s great at answering <em>&ldquo;what is the CPU busy doing&rdquo;</em> and borderline useless at answering <em>&ldquo;what is this thread actually waiting on,&rdquo;</em> because every blocking or duration-based event — thread parks, monitor waits, socket reads, file writes — is threshold-gated, typically at 10–20ms. Anything faster than that threshold is treated as beneath notice and never gets recorded. Which is a problem, because backpressure, fast retries, and hot-but-brief locks all live comfortably under that threshold, having a party JFR doesn&rsquo;t know is happening.</p>
+<p>Here&rsquo;s the genuinely annoying part: the recording doesn&rsquo;t look broken. You get a real file, non-zero size, opens fine in JMC, no errors. You look at the thread you care about, see low CPU and a whole lot of nothing else, and conclude it&rsquo;s basically idle. It isn&rsquo;t. It&rsquo;s busy — just busy doing something the recording was configured not to see. Below: how that happens, what it looks like when it bites you, the exact commands to reproduce it and then fix it, and four ways to get the missing signal back (spoiler: none of them are free).</p>
+<h2 id="a-concrete-scenario">A concrete scenario <a href="#a-concrete-scenario" class="anchor">🔗</a></h2><p>Picture a classic producer/consumer setup: one thread reads from a source — a socket, a file, a queue, doesn&rsquo;t matter — and pushes items onto a fixed-size in-memory buffer; a pool of worker threads drains that buffer and does the real work. Log shippers, stream processors, ETL jobs, anything with a &ldquo;read fast, process slower&rdquo; split — this shape is everywhere.</p>
+<p>Throughput has fallen off a cliff. It used to cruise at ~50,000 items/sec; now it&rsquo;s stuck around 17,000/sec under what looks like identical load. You reach for a JFR recording to find out why. It comes back clean — legit multi-megabyte file, no complaints. You pull up the producer thread specifically, since that&rsquo;s the one reading off the source, and here&rsquo;s what greets you:</p>
+<ul>
+<li>~22% CPU utilization</li>
+<li><strong>Zero</strong> <code>ThreadPark</code> events</li>
+<li><strong>Zero</strong> <code>ThreadSleep</code> events</li>
+<li><strong>Zero</strong> <code>JavaMonitorWait</code> events</li>
+<li>3 <code>SocketRead</code> events, in a multi-minute window</li>
+</ul>
+<p>Nothing here screams &ldquo;blocked.&rdquo; Nothing whispers &ldquo;waiting on a lock&rdquo; either. By the numbers in the file, this thread looks basically like it&rsquo;s taking a nap. So where did the other ~78% of its wall-clock time actually go? Honest answer: <strong>you don&rsquo;t know yet.</strong> You have a throughput graph yelling that something is wrong and a profiler shrugging. Those two things aren&rsquo;t in conflict — they&rsquo;re both consistent with a full queue throttling the producer — but the JFR file hasn&rsquo;t <em>proven</em> anything. &ldquo;The queue must be backpressuring it&rdquo; is the obvious story, and it might even be the right one, but right now it&rsquo;s a guess dressed up as a finding.</p>
+<h2 id="why-the-recording-missed-it">Why the recording missed it <a href="#why-the-recording-missed-it" class="anchor">🔗</a></h2><p>Worth being precise about what the two families of JFR events actually measure, because they&rsquo;re answering different questions and it&rsquo;s easy to assume one covers for the other:</p>
+<p>★ Insight ──────────────────────────────────────
+jdk.ExecutionSample — the event behind every CPU flamegraph — only fires for a thread that&rsquo;s RUNNABLE and physically on a core at the instant of the sample. If the thread is parked, blocked, or waiting, there is no sample to take, full stop. Duration events (ThreadPark, JavaMonitorEnter, SocketRead, and friends) are the <em>only</em> mechanism JFR has for pinning off-CPU wall-clock time to a cause. A CPU profile and a &ldquo;where does the wall-clock actually go&rdquo; profile are two different instruments, and the default template only reliably builds the first one.
+───────────────────────────────────────────</p>
+<p>So the producer&rsquo;s low CPU% is entirely consistent with it spending most of its life off-CPU. The real question is why none of the duration events caught it — and here&rsquo;s the actual mechanism: <strong>a bounded queue&rsquo;s backpressure is fast by design.</strong> A decent implementation doesn&rsquo;t block a producer for tens of milliseconds at a stretch when the queue&rsquo;s full; it uses something like <code>LockSupport.parkNanos()</code> with a short timeout, or a tight backoff, and checks again almost immediately. The producer ends up flapping between &ldquo;briefly parked&rdquo; and &ldquo;briefly running&rdquo; possibly thousands of times a second — but each individual park lasts a fraction of a millisecond, comfortably under the ~10–20ms bar <code>ThreadPark</code> needs to clear by default. Every single park is real. Every single one is invisible to the recording, because none of them alone is big enough to earn a spot in the file.</p>
+<p>This isn&rsquo;t JFR being lazy — it&rsquo;s a deliberate tradeoff. Record every <code>JavaMonitorEnter</code> and <code>ThreadPark</code> unconditionally with a full stack trace, and a busy service doing fine-grained backpressure could spray hundreds of thousands of events a second at the recorder. JFR is built to be cheap enough to leave running in production all the time, so the JDK engineers gated these events on the assumption that anything shorter than the threshold is normal scheduling noise, not a diagnostic signal. That assumption happens to be exactly backwards for backpressure and lock contention, which live <em>by design</em> in the sub-millisecond-to-low-millisecond range — precisely the range the default threshold treats as noise.</p>
+<h2 id="what-else-falls-into-the-same-crack">What else falls into the same crack <a href="#what-else-falls-into-the-same-crack" class="anchor">🔗</a></h2><p>The queue-backpressure story above is one instance of a wider pattern. Anything fast-but-frequent, rather than slow-but-rare, tends to slip through the same gap:</p>
+<table>
+  <thead>
+      <tr>
+          <th style="text-align: left">What you don&rsquo;t see</th>
+          <th style="text-align: left">Why</th>
+          <th style="text-align: left">What it looks like instead</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Sub-threshold queue backpressure (<code>parkNanos</code> on enqueue/dequeue)</td>
+          <td style="text-align: left"><code>ThreadPark</code> gated at ~10–20ms by default</td>
+          <td style="text-align: left">Low CPU%, zero blocking events — indistinguishable from genuinely idle</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Tight retry/backoff loops</td>
+          <td style="text-align: left">Same threshold gate on <code>ThreadSleep</code>/<code>ThreadPark</code></td>
+          <td style="text-align: left">Looks exactly like an idle thread</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Lock contention that&rsquo;s frequent but each hold is brief</td>
+          <td style="text-align: left"><code>JavaMonitorEnter</code> gated by hold duration</td>
+          <td style="text-align: left">Invisible unless one particular acquire happens to run long enough to trip the threshold</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Lots of small, fast I/O (thousands of tiny reads/sec, each sub-millisecond)</td>
+          <td style="text-align: left"><code>SocketRead</code>/<code>FileWrite</code> gated per-event by duration</td>
+          <td style="text-align: left">A socket doing 20k+ tiny reads a second, each a few dozen microseconds, can eat most of the wall-clock budget while showing almost nothing in the recording</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Off-CPU wall-clock time in general</td>
+          <td style="text-align: left">No event fires unless <em>some</em> duration event on that thread crosses its own threshold</td>
+          <td style="text-align: left">The missing time isn&rsquo;t flagged as an error — it&rsquo;s just not in the file, so the recording looks complete while being blind to the dominant cost</td>
+      </tr>
+  </tbody>
+</table>
+<p>That last row is the real trap. A JFR summary will never say &ldquo;78% of this thread&rsquo;s time is unaccounted for&rdquo; — there&rsquo;s no event for &ldquo;nothing else fired.&rdquo; The time just isn&rsquo;t there, and a recording silently missing the dominant cost looks, on the surface, exactly like a recording of a system that&rsquo;s genuinely fine.</p>
+<h2 id="try-it-yourself-reproducing-the-blind-spot">Try it yourself: reproducing the blind spot <a href="#try-it-yourself-reproducing-the-blind-spot" class="anchor">🔗</a></h2><p>You don&rsquo;t need our exact scenario to see this — you can watch a default JFR go blind on a contended lock in about two minutes. Here&rsquo;s the loop.</p>
+<p><strong>1. Start the JVM with JFR ready to go, and grab a PID.</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>java -XX:+FlightRecorder -jar your-app.jar &amp;
+</span></span><span style="display:flex;"><span>jps -l          <span style="color:#75715e"># find your app&#39;s PID</span>
+</span></span></code></pre></div><p><strong>2. Kick off a plain-vanilla <code>profile</code>-template recording via <code>jcmd</code> — no custom settings, just the default.</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>jcmd &lt;pid&gt; JFR.start name<span style="color:#f92672">=</span>baseline settings<span style="color:#f92672">=</span>profile duration<span style="color:#f92672">=</span>60s filename<span style="color:#f92672">=</span>baseline.jfr
+</span></span></code></pre></div><p>Let it run its 60 seconds, or stop it early:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>jcmd &lt;pid&gt; JFR.stop name<span style="color:#f92672">=</span>baseline
+</span></span></code></pre></div><p><strong>3. Print the events that matter for our story and admire the silence.</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>jfr print --events jdk.ThreadPark,jdk.JavaMonitorEnter,jdk.JavaMonitorWait baseline.jfr | head -50
+</span></span><span style="display:flex;"><span>jfr summary baseline.jfr | grep -E <span style="color:#e6db74">&#34;ThreadPark|JavaMonitorEnter|JavaMonitorWait|ExecutionSample&#34;</span>
+</span></span></code></pre></div><p>On a service with fast, frequent locking or backpressure, don&rsquo;t be surprised if <code>ThreadPark</code>/<code>JavaMonitorEnter</code> show up as zero, or close to it, while <code>ExecutionSample</code> looks perfectly normal. That gap between &ldquo;CPU profile looks fine&rdquo; and &ldquo;throughput is in the toilet&rdquo; is the whole post in one command.</p>
+<p><strong>4. Now build a version of the template with the thresholds ripped out, and run it again.</strong></p>
+<p>The cleanest way is to export the built-in <code>profile</code> template, edit two lines, and load your edited copy back in. <code>JAVA_HOME</code> should point at your JDK install:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># grab the stock template as a starting point</span>
+</span></span><span style="display:flex;"><span>cp <span style="color:#e6db74">&#34;</span>$JAVA_HOME<span style="color:#e6db74">/lib/jfr/profile.jfc&#34;</span> ./contention.jfc
+</span></span></code></pre></div><p>Open <code>contention.jfc</code> and find the settings for the events you care about — they look like this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-xml" data-lang="xml"><span style="display:flex;"><span><span style="color:#f92672">&lt;event</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;jdk.JavaMonitorEnter&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;setting</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;enabled&#34;</span><span style="color:#f92672">&gt;</span>true<span style="color:#f92672">&lt;/setting&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;setting</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;threshold&#34;</span><span style="color:#f92672">&gt;</span>10 ms<span style="color:#f92672">&lt;/setting&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;setting</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;stackTrace&#34;</span><span style="color:#f92672">&gt;</span>true<span style="color:#f92672">&lt;/setting&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/event&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;event</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;jdk.ThreadPark&#34;</span><span style="color:#f92672">&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;setting</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;enabled&#34;</span><span style="color:#f92672">&gt;</span>true<span style="color:#f92672">&lt;/setting&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;setting</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;threshold&#34;</span><span style="color:#f92672">&gt;</span>10 ms<span style="color:#f92672">&lt;/setting&gt;</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&lt;setting</span> <span style="color:#a6e22e">name=</span><span style="color:#e6db74">&#34;stackTrace&#34;</span><span style="color:#f92672">&gt;</span>true<span style="color:#f92672">&lt;/setting&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">&lt;/event&gt;</span>
+</span></span></code></pre></div><p>Change <code>threshold</code> to <code>0 ms</code> on <code>jdk.JavaMonitorEnter</code>, <code>jdk.ThreadPark</code>, and <code>jdk.JavaMonitorWait</code> (and, if you suspect chatty I/O, <code>jdk.SocketRead</code>/<code>jdk.SocketWrite</code>/<code>jdk.FileRead</code>/<code>jdk.FileWrite</code> too), save it, then run a <strong>short</strong> capture with it — this configuration is going to record <em>a lot</em>:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>jcmd &lt;pid&gt; JFR.start name<span style="color:#f92672">=</span>contention settings<span style="color:#f92672">=</span>./contention.jfc duration<span style="color:#f92672">=</span>60s filename<span style="color:#f92672">=</span>contention.jfr
+</span></span><span style="display:flex;"><span>jcmd &lt;pid&gt; JFR.stop name<span style="color:#f92672">=</span>contention
+</span></span></code></pre></div><p><strong>5. Compare the two files.</strong></p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>jfr summary contention.jfr | grep -E <span style="color:#e6db74">&#34;ThreadPark|JavaMonitorEnter|JavaMonitorWait&#34;</span>
+</span></span></code></pre></div><p>Where <code>baseline.jfr</code> showed zero or near-zero, <code>contention.jfr</code> should show real counts — potentially a lot of them — with full stack traces telling you exactly which call site is doing the parking. That&rsquo;s the signal that was there all along, just filtered out by the default threshold.</p>
+<h2 id="the-other-three-ways-to-get-the-signal-back">The other three ways to get the signal back <a href="#the-other-three-ways-to-get-the-signal-back" class="anchor">🔗</a></h2><p>Editing a <code>.jfc</code> and re-running is the most direct fix, but it&rsquo;s not the only lever, and it&rsquo;s not always the cheapest one.</p>
+<h3 id="measure-the-suspected-resource-directly-skip-the-profiler-entirely">Measure the suspected resource directly, skip the profiler entirely <a href="#measure-the-suspected-resource-directly-skip-the-profiler-entirely" class="anchor">🔗</a></h3><p>If the thing you suspect already exposes its own instrumentation — plenty of queue implementations, connection pools, and thread pools publish current occupancy via JMX or an equivalent metrics endpoint — just read that number. A queue pinned near-full means the producer keeps getting stuffed back on enqueue (bottleneck downstream); pinned near-empty means consumers are starving (bottleneck upstream). No sampling, no thresholds, no guessing — just a number you read straight off the object.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#75715e"># quick one-liner if you have jmxterm or similar on hand</span>
+</span></span><span style="display:flex;"><span>echo <span style="color:#e6db74">&#39;get -b your.domain:type=Queue,name=main RemainingCapacity TotalCapacity&#39;</span> | java -jar jmxterm.jar -l localhost:9010
+</span></span></code></pre></div><p><strong>Cost:</strong> basically free — it&rsquo;s a metrics read, not a recording. <strong>Do this first</strong>, before reaching for any of the heavier profiling options, whenever the component in question already exposes what you need.</p>
+<h3 id="use-wall-clock-profiling-instead-of-cpu-profiling">Use wall-clock profiling instead of CPU profiling <a href="#use-wall-clock-profiling-instead-of-cpu-profiling" class="anchor">🔗</a></h3><p>Tools that support wall-clock sampling (rather than CPU-time sampling) — <code>async-profiler</code> in <code>-e wall</code> mode is the standard example — sample <em>every</em> thread on a fixed real-time interval regardless of whether it&rsquo;s running, blocked, or parked, and attribute the sample to whatever frame it&rsquo;s in. Off-CPU time shows up as named stack frames instead of vanishing.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>./profiler.sh -e wall -d <span style="color:#ae81ff">60</span> -f wall-profile.jfr &lt;pid&gt;
+</span></span></code></pre></div><p><strong>Cost:</strong> somewhat more overhead than CPU-only sampling (you&rsquo;re now sampling threads a CPU profiler would skip entirely), and it&rsquo;s a different tool/mode than a default JFR capture — though many of these emit standard JFR-format output, so you can still crack it open in JMC.</p>
+<h3 id="build-busyblocked-accounting-into-the-application-itself">Build busy/blocked accounting into the application itself <a href="#build-busyblocked-accounting-into-the-application-itself" class="anchor">🔗</a></h3><p>If this class of bottleneck — queueing, backpressure, handoffs between pipeline stages — is one you expect to keep chasing, the most durable answer is to stop asking a profiler after the fact and instead have the application track its own busy-vs-blocked time per thread/stage, with queue occupancy exposed as a standing metric. It&rsquo;s the permanent, purpose-built version of &ldquo;just read the gauge&rdquo; above.</p>
+<p><strong>Cost:</strong> real upfront engineering effort, near-zero runtime overhead once it&rsquo;s in — it&rsquo;s counters, not a profiler.</p>
+<h2 id="the-practical-takeaway">The practical takeaway <a href="#the-practical-takeaway" class="anchor">🔗</a></h2><p>Don&rsquo;t read &ldquo;low CPU%, no blocking events, no obvious hot method&rdquo; as proof a thread is idle. Under a default-configuration JFR, that exact signature is <em>also</em> what a sub-threshold backpressure bottleneck looks like, and the file gives you no way to tell the two apart. The default template is tuned to be cheap enough to run everywhere, and it buys that cheapness by throwing away precisely the class of event that queueing and lock-contention problems live in. So when a recording insists a thread is idle but your throughput graph says otherwise, treat that mismatch as the finding — and go get the zero-threshold capture, the direct queue metric, or the wall-clock profile that actually answers the question you&rsquo;re asking.</p>
+
+    </div>
+
+    
+        <div class="tags">
+            
+                <a href="https://shashank-93rao.github.io/tags/jfr">JFR</a>
+            
+                <a href="https://shashank-93rao.github.io/tags/performance">performance</a>
+            
+        </div>
+    
+    
+    
+
+</section>
+
+
+    </main>
+
+    <footer id="footer">
+    
+        <div id="social">
+
+
+    <a class="symbol" href="https://github.com/shashank-93rao" rel="me" target="_blank">
+        
+        <svg fill="#bbbbbb" width="28" height="28"  viewBox="0 0 72 72" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    
+    <title>Github</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Social-Icons---Rounded-Black" transform="translate(-264.000000, -939.000000)">
+            <g id="Github" transform="translate(264.000000, 939.000000)">
+                <path d="M8,72 L64,72 C68.418278,72 72,68.418278 72,64 L72,8 C72,3.581722 68.418278,-8.11624501e-16 64,0 L8,0 C3.581722,8.11624501e-16 -5.41083001e-16,3.581722 0,8 L0,64 C5.41083001e-16,68.418278 3.581722,72 8,72 Z" id="Rounded" fill="#bbbbbb"></path>
+                <path d="M35.9985,13 C22.746,13 12,23.7870921 12,37.096644 C12,47.7406712 18.876,56.7718301 28.4145,59.9584121 C29.6145,60.1797862 30.0525,59.4358488 30.0525,58.7973276 C30.0525,58.2250681 30.0315,56.7100863 30.0195,54.6996482 C23.343,56.1558981 21.9345,51.4693938 21.9345,51.4693938 C20.844,48.6864054 19.2705,47.9454799 19.2705,47.9454799 C17.091,46.4500754 19.4355,46.4801943 19.4355,46.4801943 C21.843,46.6503662 23.1105,48.9634994 23.1105,48.9634994 C25.2525,52.6455377 28.728,51.5823398 30.096,50.9649018 C30.3135,49.4077535 30.9345,48.3460615 31.62,47.7436831 C26.2905,47.1352808 20.688,45.0691228 20.688,35.8361671 C20.688,33.2052792 21.6225,31.0547881 23.1585,29.3696344 C22.911,28.7597262 22.0875,26.3110578 23.3925,22.9934585 C23.3925,22.9934585 25.4085,22.3459017 29.9925,25.4632101 C31.908,24.9285993 33.96,24.6620468 36.0015,24.6515052 C38.04,24.6620468 40.0935,24.9285993 42.0105,25.4632101 C46.5915,22.3459017 48.603,22.9934585 48.603,22.9934585 C49.9125,26.3110578 49.089,28.7597262 48.8415,29.3696344 C50.3805,31.0547881 51.309,33.2052792 51.309,35.8361671 C51.309,45.0917119 45.6975,47.1292571 40.3515,47.7256117 C41.2125,48.4695491 41.9805,49.9393525 41.9805,52.1877301 C41.9805,55.4089489 41.9505,58.0067059 41.9505,58.7973276 C41.9505,59.4418726 42.3825,60.1918338 43.6005,59.9554002 C53.13,56.7627944 60,47.7376593 60,37.096644 C60,23.7870921 49.254,13 35.9985,13" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>
+    </a>
+
+    <a class="symbol" href="https://www.linkedin.com/in/shashank93rao/" rel="me" target="_blank">
+        
+        <svg width="28" height="28" fill="#bbbbbb" viewBox="0 0 500 500">
+  <g fill="none" fill-rule="evenodd">
+    <rect width="500" height="500" fill="#bbbbbb" rx="50"/>
+    <path fill="#FFF" d="M154.703 100.183c-19.121 0-34.689 15.565-34.703 34.701 0 19.136 15.568 34.704 34.703 34.704 19.128 0 34.688-15.568 34.688-34.704 0-19.134-15.561-34.701-34.688-34.701zm26.045 83.348h-52.094a4.488 4.488 0 0 0-4.488 4.489v167.675a4.488 4.488 0 0 0 4.488 4.488h52.093a4.49 4.49 0 0 0 4.489-4.488V188.02a4.486 4.486 0 0 0-4.488-4.489zm133.176-1.974c-19.064 0-35.817 5.805-46.04 15.271v-8.808c0-2.48-2.01-4.489-4.489-4.489h-49.971a4.489 4.489 0 0 0-4.489 4.489v167.675a4.488 4.488 0 0 0 4.489 4.488h52.044a4.49 4.49 0 0 0 4.489-4.488v-82.957c0-23.802 4.378-38.555 26.227-38.555 21.526.026 23.137 15.846 23.137 39.977v81.535a4.489 4.489 0 0 0 4.49 4.488h52.068a4.489 4.489 0 0 0 4.488-4.488v-91.977c-.001-38.253-7.553-82.161-66.443-82.161z"/>
+  </g>
+</svg>
+
+    </a>
+
+
+</div>
+
+    
+
+    <div class="copyright">
+    
+        © Copyright 2026 Shashank Rao
+    
+    </div>
+
+    
+</footer>
+
+
+
+
+    
+  </body>
+</html>

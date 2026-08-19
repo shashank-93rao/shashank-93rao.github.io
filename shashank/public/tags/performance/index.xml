@@ -6,8 +6,15 @@
     <description>Recent content in Performance on /home/shashankrao/</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 25 Apr 2026 20:08:01 +0530</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2026 14:10:50 +0530</lastBuildDate>
     <atom:link href="https://shashank-93rao.github.io/tags/performance/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>JFR Blindspots</title>
+      <link>https://shashank-93rao.github.io/posts/the-blind-spot-in-just-take-a-jfr--why-cpu-hot-profiling-misses-queue-backpressure/</link>
+      <pubDate>Wed, 19 Aug 2026 14:10:50 +0530</pubDate>
+      <guid>https://shashank-93rao.github.io/posts/the-blind-spot-in-just-take-a-jfr--why-cpu-hot-profiling-misses-queue-backpressure/</guid>
+      <description>&lt;h2 id=&#34;tldr&#34;&gt;TL;DR &lt;a href=&#34;#tldr&#34; class=&#34;anchor&#34;&gt;🔗&lt;/a&gt;&lt;/h2&gt;&lt;p&gt;Java Flight Recorder&amp;rsquo;s default profiling configuration (the &lt;code&gt;profile&lt;/code&gt; template — what you get from JMC&amp;rsquo;s &amp;ldquo;Start Flight Recording&amp;rdquo; wizard, most &amp;ldquo;attach and capture&amp;rdquo; tooling, and JFR-mode &lt;code&gt;async-profiler&lt;/code&gt; runs out of the box) is CPU-sampling biased. It&amp;rsquo;s great at answering &lt;em&gt;&amp;ldquo;what is the CPU busy doing&amp;rdquo;&lt;/em&gt; and borderline useless at answering &lt;em&gt;&amp;ldquo;what is this thread actually waiting on,&amp;rdquo;&lt;/em&gt; because every blocking or duration-based event — thread parks, monitor waits, socket reads, file writes — is threshold-gated, typically at 10–20ms. Anything faster than that threshold is treated as beneath notice and never gets recorded. Which is a problem, because backpressure, fast retries, and hot-but-brief locks all live comfortably under that threshold, having a party JFR doesn&amp;rsquo;t know is happening.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Writing Code the JVM Wants to Optimise</title>
       <link>https://shashank-93rao.github.io/posts/writing-code-the-jvm-wants-to-optimise/</link>

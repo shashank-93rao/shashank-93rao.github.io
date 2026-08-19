@@ -6,20 +6,27 @@
     <description>Recent content in Tags on /home/shashankrao/</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 25 Apr 2026 20:08:01 +0530</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2026 14:10:50 +0530</lastBuildDate>
     <atom:link href="https://shashank-93rao.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Jfr</title>
+      <link>https://shashank-93rao.github.io/tags/jfr/</link>
+      <pubDate>Wed, 19 Aug 2026 14:10:50 +0530</pubDate>
+      <guid>https://shashank-93rao.github.io/tags/jfr/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Performance</title>
+      <link>https://shashank-93rao.github.io/tags/performance/</link>
+      <pubDate>Wed, 19 Aug 2026 14:10:50 +0530</pubDate>
+      <guid>https://shashank-93rao.github.io/tags/performance/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Java</title>
       <link>https://shashank-93rao.github.io/tags/java/</link>
       <pubDate>Sat, 25 Apr 2026 20:08:01 +0530</pubDate>
       <guid>https://shashank-93rao.github.io/tags/java/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Jfr</title>
-      <link>https://shashank-93rao.github.io/tags/jfr/</link>
-      <pubDate>Sat, 25 Apr 2026 20:08:01 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/tags/jfr/</guid>
       <description></description>
     </item>
     <item>
@@ -34,13 +41,6 @@
       <link>https://shashank-93rao.github.io/tags/jvm/</link>
       <pubDate>Sat, 25 Apr 2026 20:08:01 +0530</pubDate>
       <guid>https://shashank-93rao.github.io/tags/jvm/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Performance</title>
-      <link>https://shashank-93rao.github.io/tags/performance/</link>
-      <pubDate>Sat, 25 Apr 2026 20:08:01 +0530</pubDate>
-      <guid>https://shashank-93rao.github.io/tags/performance/</guid>
       <description></description>
     </item>
     <item>
