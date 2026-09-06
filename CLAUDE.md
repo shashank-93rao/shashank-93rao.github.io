@@ -6,6 +6,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a personal blog built with **Astro** (the [AstroPaper](https://github.com/satnaing/astro-paper) theme) and hosted on GitHub Pages at `https://shashank-93rao.github.io/`. It was migrated from Hugo in September 2026. Deployment is via GitHub Actions (`.github/workflows/deploy.yml`), which builds and publishes on every push to `main` — there's no manual build/copy step and no `docs/` directory anymore.
 
+## Requirements
+
+Node **>=22.12.0** (set in `package.json` engines). The system default on this machine may be older (e.g. v16) — use nvm:
+```bash
+export NVM_DIR="$HOME/.nvm"; [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+nvm use 22
+```
+
+After editing `package.json` (dependencies or scripts), run `npm install` to regenerate `package-lock.json` before committing — a stale lockfile makes `npm ci` fail in CI (`npm error ... lock file's ... does not satisfy ...`). If you change dependency versions, also do a clean `rm -rf node_modules && npm ci` locally before trusting a build — a lockfile install under the wrong Node version can leave broken native binaries (e.g. rolldown) in `node_modules`.
+
 ## Commands
 
 **Local development:**
@@ -93,11 +103,11 @@ Color tokens live in `src/styles/theme.css` (light: "Pyit Tine Htaung" warm/crea
 
 ## Search
 
-Fuse.js/Pagefind (via `astro-paper.config.ts`'s `features.search: "pagefind"`) is built into `npm run build` — no separate indexing step needed.
+Pagefind (`astro-paper.config.ts`'s `features.search: "pagefind"`) is built into `npm run build` — no separate indexing step needed.
 
 ## Deployment
 
-Push to `main` triggers `.github/workflows/deploy.yml`, which builds and deploys via `actions/deploy-pages`. GitHub repo Settings → Pages → Source must be set to **GitHub Actions** (not a branch) for this to work.
+Push to `main` triggers `.github/workflows/deploy.yml`, which builds and deploys via `actions/deploy-pages`. Repo Settings → Pages → Source is already set to **GitHub Actions** (confirmed via `gh api repos/shashank-93rao/shashank-93rao.github.io/pages`, `build_type: "workflow"`) — don't switch it back to a branch, or GitHub's legacy Jekyll builder will run again on every push and fail (it looks for a `docs/` folder that no longer exists).
 
 ## Documentation
 
