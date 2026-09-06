@@ -1,0 +1,48 @@
+---
+import { getCollection } from "astro:content";
+import { postFilter } from "@/utils/postFilter";
+import { getPostUrl } from "@/utils/getPostPaths";
+
+type Props = {
+  series: string;
+  currentId: string;
+};
+
+const { series, currentId } = Astro.props;
+
+const locale = Astro.currentLocale;
+
+const seriesPosts = (await getCollection("posts"))
+  .filter(postFilter)
+  .filter(post => post.data.series === series)
+  .sort((a, b) => (a.data.order ?? 0) - (b.data.order ?? 0));
+---
+
+{
+  seriesPosts.length > 1 && (
+    <nav
+      aria-label="Series navigation"
+      class="border-border bg-muted/40 my-8 rounded border p-4"
+    >
+      <p class="text-muted-foreground mb-2 text-sm font-medium">
+        Part of the <span class="text-foreground">{series}</span> series
+      </p>
+      <ol class="list-decimal space-y-1 ps-5">
+        {seriesPosts.map(post => (
+          <li>
+            {post.id === currentId ? (
+              <span class="font-semibold">{post.data.title}</span>
+            ) : (
+              <a
+                href={getPostUrl(post.id, post.filePath, locale)}
+                class="hover:text-accent underline decoration-dashed underline-offset-4"
+              >
+                {post.data.title}
+              </a>
+            )}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
